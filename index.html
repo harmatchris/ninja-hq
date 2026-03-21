@@ -677,7 +677,9 @@ async function loadFromCloud() {
       if (data[LS.R]) { repsLog  = data[LS.R]; localStorage.setItem(LS.R, JSON.stringify(repsLog));  }
       if (data[LS.P]) { partners = data[LS.P]; localStorage.setItem(LS.P, JSON.stringify(partners)); }
       if (data[LS.S]) { sessions   = data[LS.S];   localStorage.setItem(LS.S, JSON.stringify(sessions));   }
-      if (data[LS.E]) { userEvents = data[LS.E]; localStorage.setItem(LS.E, JSON.stringify(userEvents)); }
+      if (data[LS.E]) { userEvents     = data[LS.E];     localStorage.setItem(LS.E, JSON.stringify(userEvents));     }
+      if (data[LS.T]) { customTraining = data[LS.T]; localStorage.setItem(LS.T, JSON.stringify(customTraining)); }
+      if (data[LS.F]) { customMeals    = data[LS.F];    localStorage.setItem(LS.F, JSON.stringify(customMeals));    }
     }
   } catch(e) { console.warn('Cloud sync offline, using local data'); }
 }
@@ -695,7 +697,7 @@ const FIXED_EVENTS = {
   '2026-05-30': { type:'finale1',  label:'F1',  title:'FINALE 1',  color:'#ffd23f' },
   '2026-06-02': { type:'finale2',  label:'F2',  title:'FINALE 2',  color:'#b97fff' },
 };
-const LS = { C:'njc_v6', N:'njn_v4', M:'njm_v3', R:'njr_v3', P:'njp_v3', S:'njs_v2', E:'nje_v1' };
+const LS = { C:'njc_v6', N:'njn_v4', M:'njm_v3', R:'njr_v3', P:'njp_v3', S:'njs_v2', E:'nje_v1', T:'njt_v1', F:'njf_v1' };
 
 function jParse(s){ try{ const r=JSON.parse(s); return (r !== null && r !== undefined) ? r : null; }catch{ return null; } }
 function persist(key,val){
@@ -710,7 +712,9 @@ let mLogs        = jParse(localStorage.getItem(LS.M)) || [];
 let repsLog      = jParse(localStorage.getItem(LS.R)) || {};
 let partners     = jParse(localStorage.getItem(LS.P)) || [{ id:'me', name:'Ich', color:'#ff5e1a', isMe:true }];
 let sessions     = jParse(localStorage.getItem(LS.S)) || [];
-let userEvents   = jParse(localStorage.getItem(LS.E)) || {};   // user-defined Vorrunde dates
+let userEvents     = jParse(localStorage.getItem(LS.E)) || {};
+let customTraining = jParse(localStorage.getItem(LS.T)) || {};  // overrides per exercise info-key
+let customMeals    = jParse(localStorage.getItem(LS.F)) || {};  // extra items per meal index
 let activePid    = 'me';
 let histMonth    = new Date();
 let selectedDk   = null;
@@ -1391,16 +1395,61 @@ function buildWeekPlan(){
 // TRAINING
 // ═══════════════════════════════════════════════
 function buildTraining(){
-  document.getElementById('trainingList').innerHTML = TRAINING.map(t => `
-    <div class="ex-item" onclick="openInfo('${t.info}')">
-      <div class="ex-ico">${t.icon}</div>
-      <div class="ex-inf">
-        <div class="ex-name">${t.name}</div>
-        <div class="ex-det">${t.det}</div>
-        <div class="ex-dsc">${t.dsc}</div>
+  document.getElementById('trainingList').innerHTML = TRAINING.map(t => {
+    const ov   = customTraining[t.info] || {};
+    const name = ov.name || t.name;
+    const det  = ov.det  || t.det;
+    const dsc  = ov.dsc  || t.dsc;
+    return `
+    <div class="ex-item">
+      <div class="ex-ico" onclick="openInfo('${t.info}')">${t.icon}</div>
+      <div class="ex-inf" onclick="openInfo('${t.info}')">
+        <div class="ex-name">${name}</div>
+        <div class="ex-det">${det}</div>
+        <div class="ex-dsc">${dsc}</div>
       </div>
-      <div style="color:var(--muted);font-size:17px">›</div>
-    </div>`).join('');
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div style="color:var(--muted);font-size:17px" onclick="openInfo('${t.info}')">›</div>
+        <div onclick="editExercise('${t.info}')" style="font-size:12px;cursor:pointer;color:var(--muted);padding:2px 4px;border-radius:4px;background:var(--card2)" title="Anpassen">✏️</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function editExercise(info){
+  const t  = TRAINING.find(x => x.info === info);
+  const ov = customTraining[info] || {};
+  const isCustom = !!customTraining[info];
+  window._editEx = info;
+  openModal('✏️','ÜBUNG ANPASSEN', t ? t.name : info,
+    `<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+      <label style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace">NAME</label>
+      <input id="ex_name" value="${ov.name||t?.name||''}" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px;border-radius:8px;font-size:13px;width:100%">
+      <label style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace">WANN / DETAIL</label>
+      <input id="ex_det"  value="${ov.det||t?.det||''}"  style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px;border-radius:8px;font-size:13px;width:100%">
+      <label style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace">BESCHREIBUNG</label>
+      <input id="ex_dsc"  value="${ov.dsc||t?.dsc||''}"  style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px;border-radius:8px;font-size:13px;width:100%">
+      <button onclick="saveExercise()" style="background:#ff5e1a;color:#080a0d;border:none;padding:12px;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:4px">SPEICHERN</button>
+      ${isCustom ? `<button onclick="resetExercise('${info}')" style="background:var(--card2);color:var(--muted);border:1px solid var(--border);padding:10px;border-radius:8px;font-size:12px;cursor:pointer">Standard wiederherstellen</button>` : ''}
+    </div>`
+  );
+}
+function saveExercise(){
+  const info = window._editEx;
+  customTraining[info] = {
+    name: document.getElementById('ex_name').value.trim(),
+    det:  document.getElementById('ex_det').value.trim(),
+    dsc:  document.getElementById('ex_dsc').value.trim(),
+  };
+  persist(LS.T, customTraining);
+  closeModal();
+  buildTraining();
+}
+function resetExercise(info){
+  delete customTraining[info];
+  persist(LS.T, customTraining);
+  closeModal();
+  buildTraining();
 }
 
 // ═══════════════════════════════════════════════
@@ -1447,16 +1496,56 @@ function buildSupps(){
 // FOOD
 // ═══════════════════════════════════════════════
 function buildFood(){
-  document.getElementById('mealList').innerHTML = MEALS.map(m => `
+  document.getElementById('mealList').innerHTML = MEALS.map((m, mi) => {
+    const extras = (customMeals[mi] || []);
+    const extraHtml = extras.map((txt, xi) => `
+      <div class="meal-item" style="border-left:2px solid rgba(255,94,26,.4)">
+        <span>${txt}</span>
+        <span onclick="removeMealItem(${mi},${xi})" style="color:var(--muted);font-size:13px;cursor:pointer;padding:4px">✕</span>
+      </div>`).join('');
+    return `
     <div class="meal-card">
-      <div class="meal-time">${m.time}</div>
-      <div class="meal-title">${m.title}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="meal-time">${m.time}</div>
+          <div class="meal-title">${m.title}</div>
+        </div>
+        <button onclick="addMealItem(${mi})" style="background:rgba(255,94,26,.12);border:1px solid rgba(255,94,26,.3);color:#ff5e1a;padding:5px 10px;border-radius:7px;font-size:11px;cursor:pointer;font-family:'Space Mono',monospace">+ HINZU</button>
+      </div>
       ${m.items.map(it => `
         <div class="meal-item" onclick="openMealInfo('${it.info}')">
           <span>${it.t}</span>
           <span style="color:var(--muted);font-size:15px">›</span>
         </div>`).join('')}
-    </div>`).join('');
+      ${extraHtml}
+    </div>`;
+  }).join('');
+}
+function addMealItem(mi){
+  window._editMeal = mi;
+  const mealTitle = MEALS[mi]?.title || 'Mahlzeit';
+  openModal('🍽️','HINZUFÜGEN', mealTitle,
+    `<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+      <input id="meal_txt" placeholder="z.B. 🥤 Proteinshake 30g" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:12px;border-radius:8px;font-size:13px;width:100%" onkeydown="if(event.key==='Enter')saveMealItem()">
+      <button onclick="saveMealItem()" style="background:#ff5e1a;color:#080a0d;border:none;padding:12px;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer">SPEICHERN</button>
+    </div>`
+  );
+  setTimeout(() => document.getElementById('meal_txt')?.focus(), 100);
+}
+function saveMealItem(){
+  const mi  = window._editMeal;
+  const txt = document.getElementById('meal_txt')?.value?.trim();
+  if(!txt) return;
+  if(!customMeals[mi]) customMeals[mi] = [];
+  customMeals[mi].push(txt);
+  persist(LS.F, customMeals);
+  closeModal();
+  buildFood();
+}
+function removeMealItem(mi, xi){
+  customMeals[mi].splice(xi, 1);
+  persist(LS.F, customMeals);
+  buildFood();
 }
 function openMealInfo(id){ const d = MEAL_INFO[id]; if(d) openModal(d.icon, d.title, d.sub||'', d.body||''); }
 
