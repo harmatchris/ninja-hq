@@ -280,7 +280,16 @@ input:focus { border-color: var(--orange); }
 .mc-cell.mc-good { background: rgba(34,232,122,.15); color: var(--green); }
 .mc-cell.mc-some { background: rgba(255,94,26,.1); color: var(--orange2); }
 .mc-cell.mc-none { background: var(--card2); color: var(--muted); }
-.mc-cell.mc-sel { border-color: var(--blue) !important; background: var(--bdim) !important; color: var(--blue) !important; }
+.mc-cell.mc-sel     { border-color: var(--blue) !important; background: var(--bdim) !important; color: var(--blue) !important; }
+.mc-cell.mc-future  { background: rgba(255,255,255,.03); color: #3a4050; }
+.mc-cell.mc-event   { background: rgba(255,94,26,.22); border: 2px solid #ff5e1a !important; color: #ff5e1a; font-weight: 700; }
+.mc-cell.mc-finale1 { background: rgba(255,210,63,.18); border: 2px solid #ffd23f !important; color: #ffd23f; font-weight: 700; }
+.mc-cell.mc-finale2 { background: rgba(185,127,255,.18); border: 2px solid #b97fff !important; color: #b97fff; font-weight: 700; }
+.prep-timeline { margin-bottom: 4px; }
+.prep-track { height: 8px; background: var(--border); border-radius: 4px; overflow: visible; position: relative; margin: 8px 0 14px; }
+.prep-fill  { height: 100%; border-radius: 4px; background: linear-gradient(90deg,#ff5e1a,#ffd23f); transition: width .6s; }
+.prep-pin   { position: absolute; top: -4px; width: 2px; height: 16px; border-radius: 1px; }
+.prep-labels { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 8px; color: var(--muted); margin-top: 2px; }
 .mc-day-lbl { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--muted); text-align: center; letter-spacing: .5px; margin-bottom: 4px; }
 .mc-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .mc-nav-btn { background: var(--card2); border: 1px solid var(--border); color: var(--text2); font-size: 14px; width: 28px; height: 28px; border-radius: 7px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -392,6 +401,25 @@ input:focus { border-color: var(--orange); }
 
 <!-- HISTORY -->
 <div id="page-history" class="page">
+  <div class="slabel">WEG ZUR SHOW</div>
+  <div class="card">
+    <div class="prep-timeline">
+      <div id="prepStatus" style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text2);letter-spacing:.5px"></div>
+      <div class="prep-track">
+        <div class="prep-fill" id="prepFill" style="width:0%"></div>
+        <div class="prep-pin" id="pin_vr"  style="background:#ff5e1a;left:0%"></div>
+        <div class="prep-pin" id="pin_f1"  style="background:#ffd23f;left:0%"></div>
+        <div class="prep-pin" id="pin_f2"  style="background:#b97fff;left:0%"></div>
+      </div>
+      <div class="prep-labels">
+        <span>START</span>
+        <span id="lbl_vr" style="color:#ff5e1a">VR</span>
+        <span id="lbl_f1" style="color:#ffd23f">F1</span>
+        <span id="lbl_f2" style="color:#b97fff">F2</span>
+      </div>
+    </div>
+  </div>
+
   <div class="slabel">KALENDER</div>
   <div class="card">
     <div class="mc-nav">
@@ -404,8 +432,16 @@ input:focus { border-color: var(--orange); }
       <div class="mc-day-lbl">DO</div><div class="mc-day-lbl">FR</div><div class="mc-day-lbl">SA</div><div class="mc-day-lbl">SO</div>
     </div>
     <div class="mini-cal" id="miniCal"></div>
-    <div style="display:flex;gap:10px;margin-top:8px;font-size:10px;color:var(--muted)">
-      <span>🟢 viel</span><span>🟠 teilweise</span><span>⬜ nichts</span>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-family:'Space Mono',monospace;font-size:9px">
+      <span style="color:var(--green)">■ voll</span>
+      <span style="color:var(--orange2)">■ teilweise</span>
+      <span style="color:var(--muted)">■ nichts</span>
+      <span style="color:#ff5e1a">■ Vorrunde</span>
+      <span style="color:#ffd23f">■ Finale 1</span>
+      <span style="color:#b97fff">■ Finale 2</span>
+    </div>
+    <div style="margin-top:8px;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">
+      Zukünftigen Tag antippen → als Vorrunde markieren
     </div>
   </div>
   <div class="slabel">TAGES-DETAIL</div>
@@ -640,7 +676,8 @@ async function loadFromCloud() {
       if (data[LS.M]) { mLogs    = data[LS.M]; localStorage.setItem(LS.M, JSON.stringify(mLogs));    }
       if (data[LS.R]) { repsLog  = data[LS.R]; localStorage.setItem(LS.R, JSON.stringify(repsLog));  }
       if (data[LS.P]) { partners = data[LS.P]; localStorage.setItem(LS.P, JSON.stringify(partners)); }
-      if (data[LS.S]) { sessions = data[LS.S]; localStorage.setItem(LS.S, JSON.stringify(sessions)); }
+      if (data[LS.S]) { sessions   = data[LS.S];   localStorage.setItem(LS.S, JSON.stringify(sessions));   }
+      if (data[LS.E]) { userEvents = data[LS.E]; localStorage.setItem(LS.E, JSON.stringify(userEvents)); }
     }
   } catch(e) { console.warn('Cloud sync offline, using local data'); }
 }
@@ -648,9 +685,17 @@ async function loadFromCloud() {
 // ═══════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════
-const TARGET = new Date('2026-05-17T10:00:00');
-const START  = new Date('2026-03-21T00:00:00');
-const LS = { C:'njc_v6', N:'njn_v4', M:'njm_v3', R:'njr_v3', P:'njp_v3', S:'njs_v2' };
+const TARGET  = new Date('2026-05-17T10:00:00');
+const START   = new Date('2026-03-21T00:00:00');
+const FINALE1 = new Date('2026-05-30T10:00:00');
+const FINALE2 = new Date('2026-06-02T10:00:00');
+// Feste Wettkampfdaten (Schlüssel = YYYY-MM-DD)
+const FIXED_EVENTS = {
+  '2026-05-17': { type:'vorrunde', label:'VR',  title:'VORRUNDE',  color:'#ff5e1a' },
+  '2026-05-30': { type:'finale1',  label:'F1',  title:'FINALE 1',  color:'#ffd23f' },
+  '2026-06-02': { type:'finale2',  label:'F2',  title:'FINALE 2',  color:'#b97fff' },
+};
+const LS = { C:'njc_v6', N:'njn_v4', M:'njm_v3', R:'njr_v3', P:'njp_v3', S:'njs_v2', E:'nje_v1' };
 
 function jParse(s){ try{ const r=JSON.parse(s); return (r !== null && r !== undefined) ? r : null; }catch{ return null; } }
 function persist(key,val){
@@ -665,6 +710,7 @@ let mLogs        = jParse(localStorage.getItem(LS.M)) || [];
 let repsLog      = jParse(localStorage.getItem(LS.R)) || {};
 let partners     = jParse(localStorage.getItem(LS.P)) || [{ id:'me', name:'Ich', color:'#ff5e1a', isMe:true }];
 let sessions     = jParse(localStorage.getItem(LS.S)) || [];
+let userEvents   = jParse(localStorage.getItem(LS.E)) || {};   // user-defined Vorrunde dates
 let activePid    = 'me';
 let histMonth    = new Date();
 let selectedDk   = null;
@@ -1095,6 +1141,7 @@ function rebuildReps(dayKey){
 // HISTORY
 // ═══════════════════════════════════════════════
 function buildHistory(){
+  buildTimeline();
   buildMiniCal();
   buildRecentHistory();
   if(selectedDk){
@@ -1104,34 +1151,98 @@ function buildHistory(){
   }
 }
 
+function buildTimeline(){
+  const now    = new Date();
+  const total  = FINALE2 - START;
+  const pct    = n => Math.min(100, Math.max(0, Math.round((n - START) / total * 100)));
+  const fillPct = pct(now);
+  document.getElementById('prepFill').style.width = fillPct + '%';
+  // Pins
+  document.getElementById('pin_vr').style.left  = pct(TARGET)  + '%';
+  document.getElementById('pin_f1').style.left  = pct(FINALE1) + '%';
+  document.getElementById('pin_f2').style.left  = pct(FINALE2) + '%';
+  // Labels
+  document.getElementById('lbl_vr').textContent = '17.5 VR';
+  document.getElementById('lbl_f1').textContent = '30.5 F1';
+  document.getElementById('lbl_f2').textContent = '2.6 F2';
+  // Status text
+  const daysToVR = Math.max(0, Math.ceil((TARGET  - now) / 86400000));
+  const daysToF2 = Math.max(0, Math.ceil((FINALE2 - now) / 86400000));
+  const weekNum  = Math.ceil((now - START) / (7*86400000));
+  document.getElementById('prepStatus').textContent =
+    `WOCHE ${weekNum} · ${fillPct}% DER PREP · ${daysToVR > 0 ? daysToVR+'T BIS VR' : daysToF2+'T BIS FINALE 2'}`;
+}
+
 function buildMiniCal(){
   const y = histMonth.getFullYear(), m = histMonth.getMonth();
-  document.getElementById('mcMonth').textContent = new Date(y,m,1).toLocaleDateString('de-DE',{month:'long',year:'numeric'}).toUpperCase();
+  document.getElementById('mcMonth').textContent =
+    new Date(y,m,1).toLocaleDateString('de-DE',{month:'long',year:'numeric'}).toUpperCase();
   let startDow = new Date(y,m,1).getDay();
-  if(startDow === 0) startDow = 7; // Mon=1
+  if(startDow === 0) startDow = 7;
   const daysInMonth = new Date(y,m+1,0).getDate();
-  const todayStr = dkToday();
+  const todayStr    = dkToday();
   const cal = document.getElementById('miniCal');
   cal.innerHTML = '';
   for(let i = 1; i < startDow; i++){
-    const c = document.createElement('div');
-    c.className = 'mc-cell mc-empty';
-    cal.appendChild(c);
+    const c = document.createElement('div'); c.className='mc-cell mc-empty'; cal.appendChild(c);
   }
   for(let day = 1; day <= daysInMonth; day++){
-    const dayKey = `${y}-${p2(m+1)}-${p2(day)}`;
-    const total  = countChecks(dayKey);
-    let cls = 'mc-none';
-    if(dayKey === todayStr)  cls = 'mc-today';
-    else if(total >= 14)     cls = 'mc-good';
-    else if(total > 0)       cls = 'mc-some';
+    const dayKey  = `${y}-${p2(m+1)}-${p2(day)}`;
+    const isFuture= dayKey > todayStr;
+    const total   = countChecks(dayKey);
+    const fixed   = FIXED_EVENTS[dayKey];
+    const userEv  = userEvents[dayKey];
+
+    let cls;
+    if      (fixed?.type === 'finale2')  cls = 'mc-finale2';
+    else if (fixed?.type === 'finale1')  cls = 'mc-finale1';
+    else if (fixed?.type === 'vorrunde') cls = 'mc-event';
+    else if (userEv?.type === 'vorrunde')cls = 'mc-event';
+    else if (dayKey === todayStr)        cls = 'mc-today';
+    else if (isFuture)                   cls = 'mc-future';
+    else if (total >= 14)                cls = 'mc-good';
+    else if (total > 0)                  cls = 'mc-some';
+    else                                 cls = 'mc-none';
+
     if(dayKey === selectedDk) cls += ' mc-sel';
+
+    const label = fixed?.label || userEv?.label || String(day);
     const c = document.createElement('div');
-    c.className = `mc-cell ${cls}`;
-    c.textContent = day;
-    c.onclick = () => { selectedDk = dayKey; buildHistory(); };
+    c.className   = `mc-cell ${cls}`;
+    c.textContent = label;
+    c.title       = fixed?.title || userEv?.title || '';
+    c.onclick = () => {
+      selectedDk = dayKey;
+      if(isFuture && !fixed) { showFutureOptions(dayKey); return; }
+      buildHistory();
+    };
     cal.appendChild(c);
   }
+}
+
+function showFutureOptions(dayKey){
+  const d    = new Date(dayKey);
+  const dateLabel = d.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
+  const isMarked  = !!userEvents[dayKey];
+  const body = isMarked
+    ? `<div style="color:var(--text2);font-size:12px;margin-bottom:12px">${dateLabel} ist als <b style="color:#ff5e1a">Vorrunde</b> markiert.</div>
+       <button onclick="removeEvent('${dayKey}')" style="background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);color:#ff4444;padding:11px;border-radius:10px;cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;width:100%">✕ MARKIERUNG ENTFERNEN</button>`
+    : `<div style="color:var(--text2);font-size:12px;margin-bottom:12px">${dateLabel}</div>
+       <button onclick="addEvent('${dayKey}','vorrunde','VR','VORRUNDE')" style="background:rgba(255,94,26,.15);border:1px solid rgba(255,94,26,.4);color:#ff5e1a;padding:11px;border-radius:10px;cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;width:100%">🏁 ALS VORRUNDE MARKIEREN</button>`;
+  openModal('📅','ZUKUNFTSTAG','Was willst du tun?', body);
+}
+
+function addEvent(dayKey, type, label, title){
+  userEvents[dayKey] = { type, label, title };
+  persist(LS.E, userEvents);
+  closeModal();
+  buildHistory();
+}
+function removeEvent(dayKey){
+  delete userEvents[dayKey];
+  persist(LS.E, userEvents);
+  closeModal();
+  buildHistory();
 }
 
 function hPrevMonth(){ histMonth = new Date(histMonth.getFullYear(), histMonth.getMonth()-1, 1); buildHistory(); }
