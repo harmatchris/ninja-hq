@@ -310,6 +310,24 @@ input:focus { border-color: var(--orange); }
   <div style="color:#5a6070;font-size:10px;font-family:'Space Mono',monospace;letter-spacing:2px">SYNC…</div>
 </div>
 
+<!-- Name-Prompt: erscheint beim ersten Start auf einem neuen Gerät -->
+<div id="nameOverlay" style="display:none;position:fixed;inset:0;background:#080a0d;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px">
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:#ff5e1a;letter-spacing:4px">🥷 NINJA HQ</div>
+  <div style="color:#a8acb8;font-size:14px;text-align:center;line-height:1.7">
+    Wie heißt du?<br>
+    <span style="font-size:11px;color:#5a6070">Gleicher Name auf allen Geräten = überall dieselben Daten</span>
+  </div>
+  <input id="nameInput" type="text" placeholder="z.B. Chris" autocomplete="off" spellcheck="false"
+    style="background:#161920;border:2px solid #2e3340;border-radius:12px;color:#e2e4ea;font-size:20px;padding:16px 20px;width:100%;max-width:300px;text-align:center;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s"
+    onkeydown="if(event.key==='Enter')setName()"
+    onfocus="this.style.borderColor='#ff5e1a'" onblur="this.style.borderColor='#2e3340'">
+  <button onclick="setName()"
+    style="background:#ff5e1a;color:#080a0d;border:none;padding:16px;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;cursor:pointer;width:100%;max-width:300px;transition:opacity .2s"
+    onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+    STARTEN →
+  </button>
+</div>
+
 <canvas id="pcvs"></canvas>
 <div id="flash"></div>
 
@@ -317,7 +335,6 @@ input:focus { border-color: var(--orange); }
 <div class="topbar">
   <div class="logo">🥷 NINJA HQ</div>
   <div class="topbar-right">
-    <button class="profile-btn" id="shareBtn" onclick="showShare()" style="background:rgba(74,158,255,.12);border-color:rgba(74,158,255,.4);color:#4a9eff" title="App teilen">🔗</button>
     <button class="profile-btn" id="profileBtn" onclick="showProfileModal()">
       <div class="pdot" id="pdot"></div>
       <span id="plabel">Ich</span>
@@ -567,51 +584,32 @@ const _urlP    = new URLSearchParams(window.location.search);
 const VIEW_UID = _urlP.get('view');       // read-only share mode
 const IS_VIEW  = !!VIEW_UID;
 let MY_UID = localStorage.getItem('ninja_uid');
-if (!MY_UID) {
-  MY_UID = 'u' + Math.random().toString(36).slice(2,9) + Date.now().toString(36);
-  localStorage.setItem('ninja_uid', MY_UID);
-}
-// ── Gerät koppeln: ?link=<uid> übernimmt die UID ──
+// Kein Auto-Generieren — beim ersten Start erscheint der Name-Prompt
+
+// ?link=<uid> als versteckter Fallback (kein Button, kein UI)
 const LINK_UID = _urlP.get('link');
 if (LINK_UID && !IS_VIEW) {
+  MY_UID = LINK_UID;
   localStorage.setItem('ninja_uid', LINK_UID);
   window.location.replace(location.origin + location.pathname);
 }
 
-const ACTIVE_UID = IS_VIEW ? VIEW_UID : MY_UID;
+let ACTIVE_UID = IS_VIEW ? VIEW_UID : MY_UID;
 
-// ── Share helpers ──
-function _copyAndShow(url, icon, title, sub, msg) {
-  navigator.clipboard.writeText(url).then(() => {
-    openModal(icon, title, sub,
-      `<div class="tip-box" style="word-break:break-all;font-size:11px;margin-bottom:8px">${url}</div>` +
-      `<div style="font-size:12px;color:var(--text2)">${msg}</div>`);
-  }).catch(() => {
-    openModal(icon, title, sub, `<div class="tip-box" style="word-break:break-all;font-size:11px">${url}</div>`);
-  });
-}
-
-function showShare() {
-  if (IS_VIEW) {
-    openModal('👁', 'ANSICHT-MODUS', 'Du schaust gerade Chris\' Training an', '<div class="tip-box">Du siehst den Trainingsfortschritt im Nur-Lesen-Modus.</div>');
+// ── Name Setup (Name-Prompt beim ersten Start) ──
+function setName() {
+  const raw = (document.getElementById('nameInput')?.value || '').trim();
+  if (!raw) {
+    const inp = document.getElementById('nameInput');
+    if (inp) { inp.style.borderColor = '#ff4444'; setTimeout(() => inp.style.borderColor = '#2e3340', 1000); }
     return;
   }
-  window._shareLink = `${location.origin}${location.pathname}?link=${MY_UID}`;
-  window._shareView = `${location.origin}${location.pathname}?view=${MY_UID}`;
-  openModal('🔗', 'TEILEN & GERÄTE', 'Was möchtest du tun?',
-    `<div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
-      <button onclick="closeModal();setTimeout(()=>_copyAndShow(window._shareLink,'🔗','GERÄTE-LINK KOPIERT!','Gerät synchronisieren','Auf dem <b>anderen Gerät</b> im Browser öffnen → automatisch verknüpft!'),80)"
-        style="background:rgba(255,94,26,.15);border:1px solid rgba(255,94,26,.4);color:#ff5e1a;padding:12px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-family:'Space Mono',monospace;letter-spacing:1px;text-align:left;width:100%">
-        🔗 GERÄTE VERKNÜPFEN<br>
-        <span style="font-size:10px;color:var(--text2);font-family:'DM Sans',sans-serif;letter-spacing:0;font-weight:400">Link auf anderem Gerät öffnen → selbe Daten überall</span>
-      </button>
-      <button onclick="closeModal();setTimeout(()=>_copyAndShow(window._shareView,'👁','LINK KOPIERT!','Fortschritt teilen','Wer diesen Link öffnet, kann deinen Fortschritt ansehen (nur lesen).'),80)"
-        style="background:rgba(74,158,255,.12);border:1px solid rgba(74,158,255,.3);color:#4a9eff;padding:12px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-family:'Space Mono',monospace;letter-spacing:1px;text-align:left;width:100%">
-        👁 FORTSCHRITT TEILEN<br>
-        <span style="font-size:10px;color:var(--text2);font-family:'DM Sans',sans-serif;letter-spacing:0;font-weight:400">Read-only Link für andere zum Zuschauen</span>
-      </button>
-    </div>`
-  );
+  MY_UID = 'u_' + raw.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  ACTIVE_UID = MY_UID;
+  localStorage.setItem('ninja_uid', MY_UID);
+  document.getElementById('nameOverlay').style.display = 'none';
+  document.getElementById('syncOverlay').style.display = 'flex';
+  _doInit();
 }
 
 // ── Cloud Sync ──
@@ -836,40 +834,36 @@ function countChecks(dayKey){
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
+async function _doInit() {
+  await loadFromCloud();
+  const ov = document.getElementById('syncOverlay');
+  if(ov) ov.remove();
+  if(IS_VIEW){
+    document.querySelector('.topbar').insertAdjacentHTML('beforebegin',
+      '<div style="background:rgba(74,158,255,.15);border-bottom:1px solid rgba(74,158,255,.4);color:#4a9eff;font-family:\'Space Mono\',monospace;font-size:9px;text-align:center;padding:6px 12px;letter-spacing:1px;flex-shrink:0">👁 ANSICHT-MODUS — Nur lesen</div>'
+    );
+  }
+  updateProfileBtn();
+  buildToday(); buildWeekGrid(); buildWeekPlan();
+  buildTraining(); buildSupps(); buildFood(); buildTeam();
+  buildMount(); renderNotes(); buildHistory(); initMic();
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   initCanvas();
   updateCountdown();
   setInterval(updateCountdown, 60000);
 
-  // Load from Firebase (cloud data always wins over cached localStorage)
-  await loadFromCloud();
-
-  // Hide loading overlay
-  const ov = document.getElementById('syncOverlay');
-  if(ov) ov.remove();
-
-  // Show view-mode banner
-  if(IS_VIEW){
-    document.querySelector('.topbar').insertAdjacentHTML('beforebegin',
-      '<div style="background:rgba(74,158,255,.15);border-bottom:1px solid rgba(74,158,255,.4);color:#4a9eff;font-family:\'Space Mono\',monospace;font-size:9px;text-align:center;padding:6px 12px;letter-spacing:1px;flex-shrink:0">👁 ANSICHT-MODUS — Nur lesen · Chris\' Trainingsfortschritt</div>'
-    );
-    // Hide share button and profile button in view mode
-    const sb = document.getElementById('shareBtn');
-    if(sb) sb.style.display='none';
+  if (!MY_UID && !IS_VIEW) {
+    // Ersten Start → Name-Prompt zeigen, Sync-Overlay verstecken
+    document.getElementById('syncOverlay').style.display = 'none';
+    const no = document.getElementById('nameOverlay');
+    no.style.display = 'flex';
+    setTimeout(() => document.getElementById('nameInput')?.focus(), 150);
+    return;
   }
 
-  updateProfileBtn();
-  buildToday();
-  buildWeekGrid();
-  buildWeekPlan();
-  buildTraining();
-  buildSupps();
-  buildFood();
-  buildTeam();
-  buildMount();
-  renderNotes();
-  buildHistory();
-  initMic();
+  await _doInit();
 });
 
 function updateCountdown(){
