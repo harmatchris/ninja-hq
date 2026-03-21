@@ -376,7 +376,13 @@ input:focus { border-color: var(--orange); }
     <div class="stat-box"><div class="stat-num" id="statDays">—</div><div class="stat-unit">Tage bis Vorrunde</div></div>
     <div class="stat-box"><div class="stat-num" id="statChecked">0</div><div class="stat-unit">Heute ✓</div></div>
   </div>
-  <div class="slabel">TRAINING HEUTE</div>
+  <!-- Datum-Navigation -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px;margin-bottom:2px">
+    <button onclick="todayNavDay(-1)" style="background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;padding:4px 10px;border-radius:8px;line-height:1" title="Vorheriger Tag">‹</button>
+    <span id="todayDateLabel" style="font-size:11px;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:1px"></span>
+    <button onclick="todayNavDay(+1)" id="todayNextBtn" style="background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;padding:4px 10px;border-radius:8px;line-height:1" title="Nächster Tag">›</button>
+  </div>
+  <div class="slabel">TRAINING</div>
   <div class="card" id="todayChecklist"></div>
   <div class="slabel" id="repsLbl" style="display:none">KRAFT-LOGGING — Sets & Reps</div>
   <div id="repsLogger"></div>
@@ -556,6 +562,17 @@ input:focus { border-color: var(--orange); }
     <div class="modal-title">👤 PROFIL WECHSELN</div>
     <div class="modal-sub" style="margin-bottom:14px">Aktives Profil bestimmt wer getrackt wird</div>
     <div id="profileModalList"></div>
+    <!-- Sync-Name -->
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
+      <div style="font-size:10px;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:1px;margin-bottom:8px">🔄 SYNC-NAME (gleicher Name = gleiche Daten überall)</div>
+      <div style="display:flex;gap:8px">
+        <input id="syncNameInput" type="text" placeholder="z.B. chris" autocomplete="off"
+          style="flex:1;background:var(--card2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:14px;padding:9px 12px;outline:none;font-family:'DM Sans',sans-serif"
+          onkeydown="if(event.key==='Enter')applySyncName()">
+        <button onclick="applySyncName()" style="background:var(--orange);color:#000;border:none;border-radius:8px;padding:9px 14px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer">OK</button>
+      </div>
+      <div id="syncNameCurrent" style="font-size:10px;color:var(--muted);margin-top:5px"></div>
+    </div>
     <button class="btn btn-ghost btn-full" onclick="closeProfileModal()" style="margin-top:12px">Abbrechen</button>
   </div>
 </div>
@@ -657,6 +674,15 @@ let stageState   = {};
 function dkToday(){ const d=new Date(); return dk(d); }
 function dk(d){ return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; }
 function p2(n){ return String(n).padStart(2,'0'); }
+
+// ── Datum-Navigation für TODAY ──
+let _viewDate = new Date();
+function todayNavDay(delta){
+  _viewDate = new Date(_viewDate);
+  _viewDate.setDate(_viewDate.getDate() + delta);
+  buildToday();
+}
+function _isToday(d){ return dk(d) === dkToday(); }
 function fmtDate(k){
   const [y,m,d]=k.split('-');
   return new Date(+y,+m-1,+d).toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
@@ -922,12 +948,22 @@ function buildToday(){
   document.getElementById('overallProg').style.width = `${((week-1)/8)*100}%`;
   document.getElementById('progLeft').textContent   = `Woche ${week}/8`;
 
+  // Datum-Label + Vorwärts-Button
+  const isToday = _isToday(_viewDate);
+  const dateKey = dk(_viewDate);
+  const WDAYS = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  const MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  const dlbl = document.getElementById('todayDateLabel');
+  if(dlbl) dlbl.textContent = isToday ? 'HEUTE' : `${WDAYS[_viewDate.getDay()]} ${_viewDate.getDate()}. ${MONTHS[_viewDate.getMonth()]}`;
+  const nxtBtn = document.getElementById('todayNextBtn');
+  if(nxtBtn) nxtBtn.style.opacity = isToday ? '0.2' : '1';
+  if(nxtBtn) nxtBtn.style.pointerEvents = isToday ? 'none' : 'auto';
+
   // Tasks
-  const today = dkToday();
   const tasks = TASKS[type] || TASKS.rest;
   const cl = document.getElementById('todayChecklist');
   cl.innerHTML = '';
-  cl.appendChild(buildCheckList(tasks, `${today}_${activePid}`));
+  cl.appendChild(buildCheckList(tasks, `${dateKey}_${activePid}`));
 
   // Reps logger — only on kraft day
   const rl    = document.getElementById('repsLogger');
@@ -935,7 +971,7 @@ function buildToday(){
   rl.innerHTML = '';
   if(type === 'kraft'){
     rlLbl.style.display = 'block';
-    KRAFT_EX.forEach(ex => rl.appendChild(buildRepsItem(ex, today)));
+    KRAFT_EX.forEach(ex => rl.appendChild(buildRepsItem(ex, dateKey)));
   } else {
     rlLbl.style.display = 'none';
   }
@@ -947,7 +983,7 @@ function buildToday(){
   if(activePid === 'me'){
     slLbl.style.display = 'block';
     const suppTasks = SUPPS.map(s => ({ id:`supp_${s.id}`, label:s.name, sub:`${s.dose} · ${s.time}`, info:s.info }));
-    sl.appendChild(buildCheckList(suppTasks, `${today}_supps`));
+    sl.appendChild(buildCheckList(suppTasks, `${dateKey}_supps`));
   } else {
     slLbl.style.display = 'none';
     sl.innerHTML = '<div style="color:var(--muted);font-size:11px;text-align:center;padding:8px">Supps werden nur für dein eigenes Profil getrackt</div>';
@@ -1365,6 +1401,24 @@ function updateProfileBtn(){
   document.getElementById('pdot').style.background = p ? p.color : 'var(--orange)';
 }
 
+function applySyncName(){
+  const raw = (document.getElementById('syncNameInput')?.value || '').trim();
+  if(!raw) return;
+  const newUID = 'u_' + raw.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  MY_UID = newUID;
+  ACTIVE_UID = newUID;
+  localStorage.setItem('ninja_uid', newUID);
+  closeProfileModal();
+  // Neu von Firebase laden mit neuer UID
+  document.body.insertAdjacentHTML('beforeend','<div id="syncOverlay2" style="position:fixed;inset:0;background:#080a0d;z-index:9999;display:flex;align-items:center;justify-content:center"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:#ff5e1a;letter-spacing:3px">🥷 SYNC…</div></div>');
+  loadFromCloud().then(() => {
+    document.getElementById('syncOverlay2')?.remove();
+    buildToday(); buildWeekGrid(); buildWeekPlan();
+    buildTraining(); buildSupps(); buildFood(); buildTeam();
+    buildMount(); renderNotes(); buildHistory();
+  });
+}
+
 function showProfileModal(){
   const el = document.getElementById('profileModalList');
   el.innerHTML = '';
@@ -1375,6 +1429,11 @@ function showProfileModal(){
     btn.onclick = () => { activePid = p.isMe ? 'me' : p.id; updateProfileBtn(); closeProfileModal(); buildToday(); };
     el.appendChild(btn);
   });
+  // Aktuellen Sync-Namen anzeigen
+  const cur = document.getElementById('syncNameCurrent');
+  if(cur) cur.textContent = MY_UID ? `Aktuell: "${MY_UID.replace('u_','')}"` : 'Noch kein Name gesetzt';
+  const inp = document.getElementById('syncNameInput');
+  if(inp) inp.value = '';
   document.getElementById('profileModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
