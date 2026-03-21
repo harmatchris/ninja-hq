@@ -715,13 +715,14 @@ function attachRealtimeListener() {
     const ap = document.querySelector('.page.active');
     if (ap) {
       const id = ap.id;
-      if      (id === 'today')    buildToday();
-      else if (id === 'training') buildTraining();
-      else if (id === 'food')     { buildFood(); buildSupps(); }
-      else if (id === 'history')  buildHistory();
-      else if (id === 'team')     buildTeam();
-      else if (id === 'notes')    renderNotes();
-      else if (id === 'cal')      { buildWeekGrid(); buildWeekPlan(); }
+      if      (id === 'page-today')    buildToday();
+      else if (id === 'page-training') buildTraining();
+      else if (id === 'page-food')     { buildFood(); buildSupps(); }
+      else if (id === 'page-supps')    buildSupps();
+      else if (id === 'page-history')  buildHistory();
+      else if (id === 'page-team')     buildTeam();
+      else if (id === 'page-notes')    renderNotes();
+      else if (id === 'page-week')     { buildWeekGrid(); buildWeekPlan(); }
     }
     // Kurzer grüner Puls im Countdown → zeigt an "Sync empfangen"
     const cd = document.getElementById('countdown');
