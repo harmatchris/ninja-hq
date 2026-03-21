@@ -1286,24 +1286,15 @@ function buildRecentHistory(){
 
 function renderHistoryDetail(dayKey){
   const el    = document.getElementById('histDetail');
-  const count = countChecks(dayKey);
   const d     = new Date(dayKey.replace(/-/g, '/'));
   const type  = getDayType(d);
   const sched = SCHED.find(s => s.type === type) || SCHED[6];
   const tasks = TASKS[type] || TASKS.rest;
-
-  // Check which tasks were done — uses the same key format as buildToday
-  const ns = `${dayKey}_me`;
+  const ns      = `${dayKey}_me`;
   const nsSuppS = `${dayKey}_supps`;
-  const allTasks = [
-    ...tasks.map(t => ({ label:t.label, done: !!checks[`${ns}_${t.id}`] })),
-    ...SUPPS.map(s => ({ label:s.name, done: !!checks[`${nsSuppS}_supp_${s.id}`] })),
-  ];
-  const done  = allTasks.filter(t => t.done);
-  const skips = allTasks.filter(t => !t.done);
 
   // Reps
-  const reps = repsLog[dayKey] || {};
+  const reps    = repsLog[dayKey] || {};
   const hasReps = Object.values(reps).some(sets => sets.length > 0);
   const repsHtml = hasReps ? `
     <div class="hreps">
@@ -1316,30 +1307,87 @@ function renderHistoryDetail(dayKey){
     </div>` : '';
 
   // Notes
-  const dayNotes = notes.filter(n => n.dk === dayKey);
+  const dayNotes  = notes.filter(n => n.dk === dayKey);
   const notesHtml = dayNotes.length ? `
     <div class="hreps">
       <div class="hreps-lbl">NOTIZEN</div>
       ${dayNotes.map(n => `<div style="font-size:11px;color:var(--text2);padding:3px 0;border-bottom:1px solid var(--border)">${n.text}</div>`).join('')}
     </div>` : '';
 
-  const badgeCls = count >= 14 ? 'pg' : count >= 6 ? 'py' : 'pr';
-  const badgeLbl = count >= 14 ? '💪 STARK' : count >= 6 ? '👍 GUT' : '😴 WENIG';
-
   el.innerHTML = `
     <div class="hday">
       <div class="hday-hd">
         <div>
           <div class="hday-date">${fmtDate(dayKey)}</div>
-          <div class="hday-type">${sched.label} · <span style="color:var(--orange)">${count} abgehakt</span></div>
+          <div class="hday-type" id="hdCount_${dayKey}">${sched.label} · <span style="color:var(--orange)">${countChecks(dayKey)} abgehakt</span></div>
         </div>
-        <span class="pill ${badgeCls}">${badgeLbl}</span>
       </div>
-      ${done.length ? `<div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--green);letter-spacing:1px;margin-bottom:4px">ERLEDIGT</div><div class="htag-wrap">${done.map(t=>`<span class="htag done">✓ ${t.label}</span>`).join('')}</div>` : ''}
-      ${skips.length ? `<div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin:8px 0 4px">NICHT ERLEDIGT</div><div class="htag-wrap">${skips.slice(0,8).map(t=>`<span class="htag skip">${t.label}</span>`).join('')}${skips.length>8?`<span class="htag skip">+${skips.length-8}</span>`:''}</div>` : ''}
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:8px">TRAINING — antippen zum Abhaken / Rückgängig</div>
+      <div id="hdTasks_${dayKey}"></div>
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin:10px 0 6px">SUPPLEMENTS</div>
+      <div id="hdSupps_${dayKey}"></div>
       ${repsHtml}
       ${notesHtml}
     </div>`;
+
+  _renderHistCheckboxes(dayKey, tasks, ns, nsSuppS);
+}
+
+function _renderHistCheckboxes(dayKey, tasks, ns, nsSuppS){
+  // Training tasks
+  const tEl = document.getElementById(`hdTasks_${dayKey}`);
+  if(tEl){
+    tEl.innerHTML = '';
+    tasks.forEach(t => {
+      const key  = `${ns}_${t.id}`;
+      const done = !!checks[key];
+      const row  = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer';
+      row.innerHTML = `
+        <div style="width:22px;height:22px;border-radius:6px;border:2px solid ${done?'var(--green)':'var(--border2)'};background:${done?'var(--green)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s">
+          <span style="color:#080a0d;font-size:13px;opacity:${done?1:0}">✓</span>
+        </div>
+        <div>
+          <div style="font-size:13px;color:${done?'var(--green)':'var(--text)'};${done?'text-decoration:line-through;opacity:.6':''}">${t.label}</div>
+          <div style="font-size:10px;color:var(--muted)">${t.sub}</div>
+        </div>`;
+      row.onclick = () => {
+        checks[key] = !checks[key];
+        persist(LS.C, checks);
+        // Update count label
+        const cl = document.getElementById(`hdCount_${dayKey}`);
+        if(cl) cl.innerHTML = `${SCHED.find(s=>s.type===getDayType(new Date(dayKey.replace(/-/g,'/'))))||SCHED[6]}`.split(',')[0].replace(/.*label:'/,'').replace(/'.*/,'') + ` · <span style="color:var(--orange)">${countChecks(dayKey)} abgehakt</span>`;
+        _renderHistCheckboxes(dayKey, tasks, ns, nsSuppS);
+        buildMiniCal(); // refresh calendar heatmap
+      };
+      tEl.appendChild(row);
+    });
+  }
+
+  // Supplement tasks
+  const sEl = document.getElementById(`hdSupps_${dayKey}`);
+  if(sEl){
+    sEl.innerHTML = '';
+    SUPPS.forEach(s => {
+      const key  = `${nsSuppS}_supp_${s.id}`;
+      const done = !!checks[key];
+      const row  = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer';
+      row.innerHTML = `
+        <div style="width:22px;height:22px;border-radius:50%;border:2px solid ${done?'var(--green)':'var(--border2)'};background:${done?'var(--green)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s">
+          <span style="color:#080a0d;font-size:12px;opacity:${done?1:0}">✓</span>
+        </div>
+        <div style="font-size:12px;color:${done?'var(--green)':'var(--text)'};${done?'opacity:.6':''}">${s.icon} ${s.name}</div>
+        <div style="font-size:10px;color:var(--muted);margin-left:auto">${s.time}</div>`;
+      row.onclick = () => {
+        checks[key] = !checks[key];
+        persist(LS.C, checks);
+        _renderHistCheckboxes(dayKey, tasks, ns, nsSuppS);
+        buildMiniCal();
+      };
+      sEl.appendChild(row);
+    });
+  }
 }
 
 // ═══════════════════════════════════════════════
