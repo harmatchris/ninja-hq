@@ -571,24 +571,47 @@ if (!MY_UID) {
   MY_UID = 'u' + Math.random().toString(36).slice(2,9) + Date.now().toString(36);
   localStorage.setItem('ninja_uid', MY_UID);
 }
+// ── Gerät koppeln: ?link=<uid> übernimmt die UID ──
+const LINK_UID = _urlP.get('link');
+if (LINK_UID && !IS_VIEW) {
+  localStorage.setItem('ninja_uid', LINK_UID);
+  window.location.replace(location.origin + location.pathname);
+}
+
 const ACTIVE_UID = IS_VIEW ? VIEW_UID : MY_UID;
 
-// ── Share ──
+// ── Share helpers ──
+function _copyAndShow(url, icon, title, sub, msg) {
+  navigator.clipboard.writeText(url).then(() => {
+    openModal(icon, title, sub,
+      `<div class="tip-box" style="word-break:break-all;font-size:11px;margin-bottom:8px">${url}</div>` +
+      `<div style="font-size:12px;color:var(--text2)">${msg}</div>`);
+  }).catch(() => {
+    openModal(icon, title, sub, `<div class="tip-box" style="word-break:break-all;font-size:11px">${url}</div>`);
+  });
+}
+
 function showShare() {
   if (IS_VIEW) {
     openModal('👁', 'ANSICHT-MODUS', 'Du schaust gerade Chris\' Training an', '<div class="tip-box">Du siehst den Trainingsfortschritt im Nur-Lesen-Modus.</div>');
     return;
   }
-  const url = `${location.origin}${location.pathname}?view=${MY_UID}`;
-  if (navigator.share) {
-    navigator.share({ title: '🥷 NINJA HQ – Trainingsfortschritt', url });
-  } else {
-    navigator.clipboard.writeText(url).then(() => {
-      openModal('🔗', 'LINK KOPIERT!', 'Teile deinen Fortschritt', `<div class="tip-box" style="word-break:break-all;font-size:11px">${url}</div><br>Wer diesen Link öffnet, kann deinen Trainingsfortschritt ansehen (nur lesen).`);
-    }).catch(() => {
-      openModal('🔗', 'SHARE LINK', 'Link zum Teilen:', `<div class="tip-box" style="word-break:break-all;font-size:11px">${url}</div>`);
-    });
-  }
+  window._shareLink = `${location.origin}${location.pathname}?link=${MY_UID}`;
+  window._shareView = `${location.origin}${location.pathname}?view=${MY_UID}`;
+  openModal('🔗', 'TEILEN & GERÄTE', 'Was möchtest du tun?',
+    `<div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+      <button onclick="closeModal();setTimeout(()=>_copyAndShow(window._shareLink,'🔗','GERÄTE-LINK KOPIERT!','Gerät synchronisieren','Auf dem <b>anderen Gerät</b> im Browser öffnen → automatisch verknüpft!'),80)"
+        style="background:rgba(255,94,26,.15);border:1px solid rgba(255,94,26,.4);color:#ff5e1a;padding:12px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-family:'Space Mono',monospace;letter-spacing:1px;text-align:left;width:100%">
+        🔗 GERÄTE VERKNÜPFEN<br>
+        <span style="font-size:10px;color:var(--text2);font-family:'DM Sans',sans-serif;letter-spacing:0;font-weight:400">Link auf anderem Gerät öffnen → selbe Daten überall</span>
+      </button>
+      <button onclick="closeModal();setTimeout(()=>_copyAndShow(window._shareView,'👁','LINK KOPIERT!','Fortschritt teilen','Wer diesen Link öffnet, kann deinen Fortschritt ansehen (nur lesen).'),80)"
+        style="background:rgba(74,158,255,.12);border:1px solid rgba(74,158,255,.3);color:#4a9eff;padding:12px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-family:'Space Mono',monospace;letter-spacing:1px;text-align:left;width:100%">
+        👁 FORTSCHRITT TEILEN<br>
+        <span style="font-size:10px;color:var(--text2);font-family:'DM Sans',sans-serif;letter-spacing:0;font-weight:400">Read-only Link für andere zum Zuschauen</span>
+      </button>
+    </div>`
+  );
 }
 
 // ── Cloud Sync ──
