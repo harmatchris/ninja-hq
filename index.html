@@ -684,6 +684,51 @@ async function loadFromCloud() {
   } catch(e) { console.warn('Cloud sync offline, using local data'); }
 }
 
+// ── Echtzeit-Listener: Änderungen von anderen Geräten sofort anzeigen ──
+let _fbRtCb = null;
+let _fbRtUID = null;
+function _applyCloudData(data) {
+  if (!data) return;
+  if (data[LS.C]) { checks   = data[LS.C]; localStorage.setItem(LS.C, JSON.stringify(checks));   }
+  if (data[LS.N]) { notes    = data[LS.N]; localStorage.setItem(LS.N, JSON.stringify(notes));    }
+  if (data[LS.M]) { mLogs    = data[LS.M]; localStorage.setItem(LS.M, JSON.stringify(mLogs));    }
+  if (data[LS.R]) { repsLog  = data[LS.R]; localStorage.setItem(LS.R, JSON.stringify(repsLog));  }
+  if (data[LS.P]) { partners = data[LS.P]; localStorage.setItem(LS.P, JSON.stringify(partners)); }
+  if (data[LS.S]) { sessions = data[LS.S]; localStorage.setItem(LS.S, JSON.stringify(sessions)); }
+  if (data[LS.E]) { userEvents     = data[LS.E]; localStorage.setItem(LS.E, JSON.stringify(userEvents)); }
+  if (data[LS.T]) { customTraining = data[LS.T]; localStorage.setItem(LS.T, JSON.stringify(customTraining)); }
+  if (data[LS.F]) { customMeals    = data[LS.F]; localStorage.setItem(LS.F, JSON.stringify(customMeals)); }
+}
+function attachRealtimeListener() {
+  // Alten Listener entfernen
+  if (_fbRtCb && _fbRtUID) {
+    fbDb.ref(`/users/${_fbRtUID}`).off('value', _fbRtCb);
+    _fbRtCb = null; _fbRtUID = null;
+  }
+  if (!ACTIVE_UID) return;
+  let skipFirst = true; // erste Auslieferung überspringen (loadFromCloud hat das schon erledigt)
+  _fbRtUID = ACTIVE_UID;
+  _fbRtCb = fbDb.ref(`/users/${ACTIVE_UID}`).on('value', (snap) => {
+    if (skipFirst) { skipFirst = false; return; }
+    _applyCloudData(snap.val());
+    // Aktiven Tab neu rendern
+    const ap = document.querySelector('.page.active');
+    if (ap) {
+      const id = ap.id;
+      if      (id === 'today')    buildToday();
+      else if (id === 'training') buildTraining();
+      else if (id === 'food')     { buildFood(); buildSupps(); }
+      else if (id === 'history')  buildHistory();
+      else if (id === 'team')     buildTeam();
+      else if (id === 'notes')    renderNotes();
+      else if (id === 'cal')      { buildWeekGrid(); buildWeekPlan(); }
+    }
+    // Kurzer grüner Puls im Countdown → zeigt an "Sync empfangen"
+    const cd = document.getElementById('countdown');
+    if (cd) { cd.style.color = '#4aff8c'; setTimeout(() => cd.style.color = '', 1500); }
+  });
+}
+
 // ═══════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════
@@ -912,6 +957,7 @@ function countChecks(dayKey){
 // ═══════════════════════════════════════════════
 async function _doInit() {
   await loadFromCloud();
+  attachRealtimeListener();   // ← Echtzeit-Sync ab jetzt aktiv
   const ov = document.getElementById('syncOverlay');
   if(ov) ov.remove();
   if(IS_VIEW){
@@ -926,6 +972,14 @@ async function _doInit() {
   // Letzten Tab wiederherstellen
   const lastTab = localStorage.getItem('ninja_last_tab');
   if(lastTab) showPage(lastTab);
+  // ── Sync-Name Banner (falls kein Name-basierter UID) ──
+  if (!IS_VIEW && MY_UID && !MY_UID.startsWith('u_')) {
+    const banner = document.createElement('div');
+    banner.id = 'syncBanner';
+    banner.style.cssText = 'position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:8000;background:#ff5e1a;color:#000;font-family:\'DM Sans\',sans-serif;font-size:12px;font-weight:600;padding:10px 16px;border-radius:12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(255,94,26,.5);max-width:340px;width:calc(100% - 32px)';
+    banner.innerHTML = `<span style="font-size:18px">⚠️</span><div style="flex:1"><div style="font-size:13px;font-weight:700">Sync nicht eingerichtet!</div><div style="font-weight:400;margin-top:1px">Tippe auf 👤 oben rechts → SYNC-NAME eingeben (z.B. <b>chris</b>) → OK. Gleiches auf allen Geräten!</div></div><button onclick="document.getElementById('syncBanner').remove();showProfileModal();" style="background:#000;color:#ff5e1a;border:none;border-radius:8px;padding:6px 10px;font-family:\'Bebas Neue\',sans-serif;font-size:14px;cursor:pointer;flex-shrink:0">FIX →</button>`;
+    document.body.appendChild(banner);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1657,9 +1711,10 @@ function applySyncName(){
   ACTIVE_UID = newUID;
   localStorage.setItem('ninja_uid', newUID);
   closeProfileModal();
-  // Neu von Firebase laden mit neuer UID
+  // Neu von Firebase laden mit neuer UID + Echtzeit-Listener neu anstecken
   document.body.insertAdjacentHTML('beforeend','<div id="syncOverlay2" style="position:fixed;inset:0;background:#080a0d;z-index:9999;display:flex;align-items:center;justify-content:center"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;color:#ff5e1a;letter-spacing:3px">🥷 SYNC…</div></div>');
   loadFromCloud().then(() => {
+    attachRealtimeListener();   // ← Listener für neue UID
     document.getElementById('syncOverlay2')?.remove();
     buildToday(); buildWeekGrid(); buildWeekPlan();
     buildTraining(); buildSupps(); buildFood(); buildTeam();
