@@ -212,6 +212,22 @@ input:focus{border-color:var(--orange);}
 .note-date{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:4px;}
 .note-text{font-size:12px;line-height:1.6;padding-right:20px;}
 .del-note{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;}
+/* Custom activities */
+.ca-section{margin-top:6px;}
+.ca-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-radius:12px;margin-bottom:6px;animation:fadeUp .2s ease;}
+.ca-item .ca-cat{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;}
+.ca-item .ca-info{flex:1;min-width:0;}
+.ca-item .ca-name{font-size:13px;font-weight:600;}
+.ca-item .ca-meta{font-size:10px;color:var(--muted);margin-top:1px;font-family:'Space Mono',monospace;}
+.ca-del{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;font-size:16px;transition:color .15s;}
+.ca-del:active{color:var(--red);}
+.ca-add-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;background:rgba(255,255,255,.02);border:1px dashed var(--border);border-radius:12px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
+.ca-add-btn:active{background:var(--odim);border-color:var(--orange);color:var(--orange);}
+.ca-form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:8px;animation:fadeUp .2s ease;}
+.ca-form input,.ca-form select{width:100%;margin-bottom:8px;}
+.ca-form select{background:var(--card2);border:1px solid var(--border);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;border-radius:10px;padding:10px 12px;outline:none;-webkit-appearance:none;appearance:none;}
+.ca-form select:focus{border-color:var(--orange);}
+.ca-form-btns{display:flex;gap:6px;}
 /* Coach only / athlet only */
 .coach-only{display:none;}
 body.coach .coach-only{display:block;}
@@ -293,6 +309,8 @@ body.coach .nav-btn.wissen-tab{opacity:1;pointer-events:auto;}
     <div id="repsLogger"></div>
     <div class="slabel"><i data-lucide="pill"></i> SUPPLEMENTS</div>
     <div id="todaySupps"></div>
+    <div class="slabel"><i data-lucide="plus-circle"></i> EIGENE AKTIVITÄTEN</div>
+    <div id="customActSection" class="ca-section"></div>
   </div>
 
   <div class="coach-only">
@@ -474,7 +492,7 @@ const START=new Date('2026-03-21T00:00:00');
 const FINALE1=new Date('2026-05-30T10:00:00');
 const FINALE2=new Date('2026-06-02T10:00:00');
 const FIXED_EVENTS={'2026-05-17':{type:'vorrunde',label:'VR'},'2026-05-30':{type:'finale1',label:'F1'},'2026-06-02':{type:'finale2',label:'F2'}};
-const LS={C:'njc_v6',N:'njn_v4',M:'njm_v3',R:'njr_v3',P:'njp_v3',S:'njs_v2',E:'nje_v1',T:'njt_v1',F:'njf_v1'};
+const LS={C:'njc_v6',N:'njn_v4',M:'njm_v3',R:'njr_v3',P:'njp_v3',S:'njs_v2',E:'nje_v1',T:'njt_v1',F:'njf_v1',A:'nja_v1'};
 
 const SCHED=[
   {day:'MO',label:'Zone 2 Fahrrad',type:'ausdauer',color:'var(--blue)',items:['60 Min Fahrrad @ 130–145 BPM','Schulter-Mobilisation 15 Min','Kein Oberkörper-Training']},
@@ -604,6 +622,7 @@ let sessions=jP(localStorage.getItem(LS.S))||[];
 let userEvents=jP(localStorage.getItem(LS.E))||{};
 let customTraining=jP(localStorage.getItem(LS.T))||{};
 let customMeals=jP(localStorage.getItem(LS.F))||{};
+let customActs=jP(localStorage.getItem(LS.A))||{};
 
 // ═══════════════════════════════════════════════
 // HELPERS
@@ -645,6 +664,7 @@ async function loadFromCloud(){
       if(data[LS.E]){userEvents=data[LS.E];localStorage.setItem(LS.E,JSON.stringify(userEvents));}
       if(data[LS.T]){customTraining=data[LS.T];localStorage.setItem(LS.T,JSON.stringify(customTraining));}
       if(data[LS.F]){customMeals=data[LS.F];localStorage.setItem(LS.F,JSON.stringify(customMeals));}
+      if(data[LS.A]){customActs=data[LS.A];localStorage.setItem(LS.A,JSON.stringify(customActs));}
     }
   }catch(e){console.warn('Cloud sync offline');}
 }
@@ -661,6 +681,7 @@ function _applyCloudData(data){
   if(data[LS.E]){userEvents=data[LS.E];localStorage.setItem(LS.E,JSON.stringify(userEvents));}
   if(data[LS.T]){customTraining=data[LS.T];localStorage.setItem(LS.T,JSON.stringify(customTraining));}
   if(data[LS.F]){customMeals=data[LS.F];localStorage.setItem(LS.F,JSON.stringify(customMeals));}
+  if(data[LS.A]){customActs=data[LS.A];localStorage.setItem(LS.A,JSON.stringify(customActs));}
 }
 function attachRealtimeListener(){
   if(_fbRtCb&&_fbRtUID){fbDb.ref(`/users/${_fbRtUID}`).off('value',_fbRtCb);_fbRtCb=null;_fbRtUID=null;}
@@ -795,6 +816,9 @@ function buildToday(){
     });
   }
 
+  // Custom activities
+  renderCustomActs(dateKey);
+
   // Coach today
   const ct=document.getElementById('coachToday');ct.innerHTML='';
   tasks.forEach(t=>{
@@ -822,6 +846,77 @@ function toggleCheck(key,el){
   checks[key]=!checks[key];
   persist(LS.C,checks);
   if(checks[key]){playCheck();doFlash();spawnP(el);}
+  buildToday();
+}
+
+// ═══════════════════════════════════════════════
+// CUSTOM ACTIVITIES
+// ═══════════════════════════════════════════════
+const CA_CATS={
+  ninja:{label:'Ninja Skills',color:'var(--orange)',icon:'swords'},
+  kraft:{label:'Kraft',color:'var(--green)',icon:'dumbbell'},
+  ausdauer:{label:'Ausdauer',color:'var(--blue)',icon:'heart-pulse'},
+  sprint:{label:'Sprint',color:'var(--yellow)',icon:'zap'},
+  stage:{label:'Stage Training',color:'var(--red)',icon:'flag'},
+  stretching:{label:'Stretching',color:'var(--purple)',icon:'wind'},
+  sonstiges:{label:'Sonstiges',color:'var(--muted)',icon:'plus-circle'}
+};
+let _caFormOpen=false;
+
+function renderCustomActs(dateKey){
+  const sec=document.getElementById('customActSection');if(!sec)return;
+  sec.innerHTML='';
+  const acts=(customActs[dateKey]||[]);
+  acts.forEach((a,i)=>{
+    const cat=CA_CATS[a.cat]||CA_CATS.sonstiges;
+    const el=document.createElement('div');el.className='ca-item';
+    el.innerHTML=`<div class="ca-cat" style="background:${cat.color}18;color:${cat.color}"><i data-lucide="${cat.icon}"></i></div>
+      <div class="ca-info"><div class="ca-name">${a.name}</div><div class="ca-meta">${cat.label}${a.duration?' · '+a.duration:''}${a.notes?' · '+a.notes:''}</div></div>
+      <button class="ca-del" onclick="event.stopPropagation();removeCustomAct('${dateKey}',${i})">✕</button>`;
+    sec.appendChild(el);
+  });
+  // Add button or form
+  if(_caFormOpen){
+    const form=document.createElement('div');form.className='ca-form';
+    form.innerHTML=`
+      <select id="caCategory"><option value="">Kategorie wählen...</option>${Object.entries(CA_CATS).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('')}</select>
+      <input type="text" id="caName" placeholder="Was hast du trainiert?" autocomplete="off">
+      <input type="text" id="caDuration" placeholder="Dauer (z.B. 2h, 45min)" autocomplete="off">
+      <input type="text" id="caNotes" placeholder="Notiz (optional)" autocomplete="off">
+      <div class="ca-form-btns">
+        <button class="btn btn-primary" style="flex:1" onclick="saveCustomAct('${dateKey}')">SPEICHERN</button>
+        <button class="btn btn-ghost" onclick="_caFormOpen=false;renderCustomActs('${dateKey}');lucide.createIcons();">ABBRECHEN</button>
+      </div>`;
+    sec.appendChild(form);
+    setTimeout(()=>{const sel=document.getElementById('caCategory');if(sel)sel.focus();},50);
+  }else{
+    const btn=document.createElement('div');btn.className='ca-add-btn';
+    btn.innerHTML='<i data-lucide="plus" style="width:16px;height:16px"></i> Aktivität hinzufügen';
+    btn.onclick=()=>{_caFormOpen=true;renderCustomActs(dateKey);lucide.createIcons();};
+    sec.appendChild(btn);
+  }
+  lucide.createIcons();
+}
+
+function saveCustomAct(dateKey){
+  const cat=document.getElementById('caCategory').value;
+  const name=document.getElementById('caName').value.trim();
+  const dur=document.getElementById('caDuration').value.trim();
+  const notes=document.getElementById('caNotes').value.trim();
+  if(!name){document.getElementById('caName').style.borderColor='var(--red)';return;}
+  if(!customActs[dateKey])customActs[dateKey]=[];
+  customActs[dateKey].push({id:'ca_'+Date.now(),cat:cat||'sonstiges',name,duration:dur,notes,ts:Date.now()});
+  persist(LS.A,customActs);
+  _caFormOpen=false;
+  playCheck();doFlash();
+  buildToday();
+}
+
+function removeCustomAct(dateKey,idx){
+  if(!customActs[dateKey])return;
+  customActs[dateKey].splice(idx,1);
+  if(!customActs[dateKey].length)delete customActs[dateKey];
+  persist(LS.A,customActs);
   buildToday();
 }
 
@@ -883,7 +978,7 @@ function buildMiniCal(){
   for(let day=1;day<=daysInMonth;day++){
     const dayKey=`${y}-${p2(m+1)}-${p2(day)}`;
     const isFuture=dayKey>todayStr;
-    const total=countChecks(dayKey);
+    const total=countChecks(dayKey)+(customActs[dayKey]||[]).length;
     const fixed=FIXED_EVENTS[dayKey];
     let cls;
     if(fixed?.type==='vorrunde')cls='mc-event';
@@ -906,12 +1001,12 @@ function buildRecentHistory(){
   const today=new Date();let any=false;
   for(let i=1;i<=7;i++){
     const d=new Date(today);d.setDate(today.getDate()-i);
-    const dayKey=dk(d);const count=countChecks(dayKey);
-    if(!count)continue;any=true;
+    const dayKey=dk(d);const count=countChecks(dayKey);const caC=(customActs[dayKey]||[]).length;
+    if(!count&&!caC)continue;any=true;
     const type=getDayType(d);const sched=SCHED.find(s=>s.type===type)||SCHED[6];
     const dateStr=d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'});
     const div=document.createElement('div');div.className='hday';
-    div.innerHTML=`<div style="display:flex;justify-content:space-between"><div><div style="font-size:14px;font-weight:700">${dateStr}</div><div style="font-size:11px;color:var(--muted)">${sched.label}</div></div><div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--green)">${count} ✓</div></div>`;
+    div.innerHTML=`<div style="display:flex;justify-content:space-between"><div><div style="font-size:14px;font-weight:700">${dateStr}</div><div style="font-size:11px;color:var(--muted)">${sched.label}${caC?' + '+caC+' eigene':''}</div></div><div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--green)">${count} ✓</div></div>`;
     div.onclick=()=>{selectedDk=dayKey;buildHistory();};
     el.appendChild(div);
   }
@@ -924,9 +1019,13 @@ function renderHistoryDetail(dayKey){
   const type=getDayType(d);const sched=SCHED.find(s=>s.type===type)||SCHED[6];
   const tasks=TASKS[type]||TASKS.rest;
   const ns=`${dayKey}_me`;const nsSuppS=`${dayKey}_supps`;
-  el.innerHTML=`<div class="gcard"><div style="font-size:14px;font-weight:700;margin-bottom:4px">${fmtDate(dayKey)}</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">${sched.label} · ${countChecks(dayKey)} abgehakt</div>
+  const dayActs=(customActs[dayKey]||[]);
+  const caCount=dayActs.length;
+  el.innerHTML=`<div class="gcard"><div style="font-size:14px;font-weight:700;margin-bottom:4px">${fmtDate(dayKey)}</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">${sched.label} · ${countChecks(dayKey)} abgehakt${caCount?' · '+caCount+' eigene':''}
+</div>
     <div class="slabel" style="margin-top:0"><i data-lucide="swords"></i> TRAINING</div><div id="hdTasks_${dayKey}"></div>
-    <div class="slabel"><i data-lucide="pill"></i> SUPPLEMENTS</div><div id="hdSupps_${dayKey}"></div></div>`;
+    <div class="slabel"><i data-lucide="pill"></i> SUPPLEMENTS</div><div id="hdSupps_${dayKey}"></div>
+    ${caCount?`<div class="slabel"><i data-lucide="plus-circle"></i> EIGENE AKTIVITÄTEN</div><div id="hdCA_${dayKey}"></div>`:''}</div>`;
   // Render checkboxes
   const tEl=document.getElementById(`hdTasks_${dayKey}`);
   tasks.forEach(t=>{
@@ -944,6 +1043,17 @@ function renderHistoryDetail(dayKey){
     row.onclick=()=>{checks[key]=!checks[key];persist(LS.C,checks);renderHistoryDetail(dayKey);buildMiniCal();};
     sEl.appendChild(row);
   });
+  // Custom activities in history
+  if(caCount){
+    const caEl=document.getElementById(`hdCA_${dayKey}`);
+    dayActs.forEach(a=>{
+      const cat=CA_CATS[a.cat]||CA_CATS.sonstiges;
+      const row=document.createElement('div');row.className='ca-item';row.style.padding='8px 10px';row.style.marginBottom='4px';
+      row.innerHTML=`<div class="ca-cat" style="background:${cat.color}18;color:${cat.color};width:26px;height:26px;border-radius:7px"><i data-lucide="${cat.icon}" style="width:14px;height:14px"></i></div>
+        <div class="ca-info"><div class="ca-name" style="font-size:12px">${a.name}</div><div class="ca-meta">${cat.label}${a.duration?' · '+a.duration:''}</div></div>`;
+      caEl.appendChild(row);
+    });
+  }
   lucide.createIcons();
 }
 
@@ -958,10 +1068,10 @@ function buildStats(){
   const daysToVR=Math.max(0,Math.floor((TARGET-now)/86400000));
   document.getElementById('statDays').textContent=daysToVR;
 
-  // Streak & trained days
+  // Streak & trained days (count custom acts too)
   const allDays=[];for(let i=0;i<60;i++){const d=new Date(now);d.setDate(d.getDate()-i);allDays.push(dk(d));}
-  let streak=0;for(const dy of allDays){if(countChecks(dy)>0)streak++;else break;}
-  const trained=allDays.filter(d=>countChecks(d)>0).length;
+  let streak=0;for(const dy of allDays){if(countChecks(dy)>0||(customActs[dy]||[]).length>0)streak++;else break;}
+  const trained=allDays.filter(d=>countChecks(d)>0||(customActs[d]||[]).length>0).length;
   document.getElementById('statStreak').textContent=streak;
   document.getElementById('statTrained').textContent=trained;
 
@@ -973,13 +1083,14 @@ function buildStats(){
   }
   document.getElementById('statSupp').textContent=suppTotal?Math.round(suppDone/suppTotal*100)+'%':'0%';
 
-  // Type distribution
-  const typeCounts={ausdauer:0,ninja:0,sprint:0,combo:0,kraft:0,rest:0};
+  // Type distribution (incl. custom activities)
+  const typeCounts={ausdauer:0,ninja:0,sprint:0,combo:0,kraft:0,rest:0,eigene:0};
   for(let i=0;i<30;i++){
-    const d=new Date(now);d.setDate(d.getDate()-i);
-    if(countChecks(dk(d))>0)typeCounts[getDayType(d)]++;
+    const d=new Date(now);d.setDate(d.getDate()-i);const dayKey=dk(d);
+    if(countChecks(dayKey)>0)typeCounts[getDayType(d)]++;
+    if((customActs[dayKey]||[]).length>0)typeCounts.eigene++;
   }
-  const typeColors={ausdauer:'var(--blue)',ninja:'var(--orange)',sprint:'var(--yellow)',combo:'var(--blue)',kraft:'var(--green)',rest:'var(--muted)'};
+  const typeColors={ausdauer:'var(--blue)',ninja:'var(--orange)',sprint:'var(--yellow)',combo:'var(--blue)',kraft:'var(--green)',rest:'var(--muted)',eigene:'var(--purple)'};
   const maxC=Math.max(1,...Object.values(typeCounts));
   let distHtml='';
   for(const[t,c] of Object.entries(typeCounts)){
