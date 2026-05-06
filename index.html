@@ -773,6 +773,7 @@
           <button class="day-nav-btn" id="prevDayBtn">←</button>
           <div class="day-nav-date" id="currentDateDisplay">-</div>
           <button class="day-nav-btn" id="nextDayBtn">→</button>
+          <button class="day-nav-btn" id="todayBtn" title="Heute" style="display: none; width: auto; padding: 0 10px; font-size: 11px; font-weight: 600; color: var(--purple);">HEUTE</button>
         </div>
 
         <div class="section" id="protokollSection" style="display: none;">
@@ -993,10 +994,14 @@
       <div class="form-group">
         <label>Kategorie</label>
         <select id="exerciseCategory">
-          <option value="ninja">Ninja Skills</option>
-          <option value="kraft">Kraft</option>
+          <option value="speed">Speed</option>
+          <option value="explosiv">Explosivität</option>
           <option value="ausdauer">Ausdauer</option>
-          <option value="sprint">Sprint</option>
+          <option value="technik">Technik</option>
+          <option value="ninja">Ninja Skills</option>
+          <option value="kraft">Kraft (Oberkörper)</option>
+          <option value="bein">Bein</option>
+          <option value="off">Ninja Off Day</option>
           <option value="stage">Stage Training</option>
           <option value="stretching">Stretching</option>
           <option value="sonstiges">Sonstiges</option>
@@ -1090,14 +1095,21 @@
       { id: 4, name: 'Finale 1 + Finale 2',    start: new Date(2026, 4, 29), end: new Date(2026, 5, 2),  color: 'var(--red)',    desc: 'Marathon-Tage' },
     ];
     const CATS = {
-      ninja: { label: 'Ninja Skills', color: 'var(--purple)', icon: 'swords' },
-      kraft: { label: 'Kraft', color: 'var(--green)', icon: 'dumbbell' },
-      ausdauer: { label: 'Ausdauer', color: 'var(--blue)', icon: 'heart-pulse' },
-      sprint: { label: 'Sprint', color: 'var(--yellow)', icon: 'zap' },
-      stage: { label: 'Stage Training', color: 'var(--red)', icon: 'flag' },
-      stretching: { label: 'Stretching', color: 'var(--cyan)', icon: 'wind' },
-      sonstiges: { label: 'Sonstiges', color: 'var(--muted)', icon: 'plus-circle' },
+      speed:      { label: 'Speed',           color: 'var(--yellow)',  icon: 'zap' },
+      explosiv:   { label: 'Explosivität',    color: 'var(--orange)',  icon: 'flame' },
+      ausdauer:   { label: 'Ausdauer',        color: 'var(--blue)',    icon: 'heart-pulse' },
+      technik:    { label: 'Technik',         color: 'var(--purple)',  icon: 'target' },
+      ninja:      { label: 'Ninja Skills',    color: 'var(--purple2)', icon: 'swords' },
+      kraft:      { label: 'Kraft (Oberkörper)', color: 'var(--green)', icon: 'dumbbell' },
+      bein:       { label: 'Bein',            color: 'var(--cyan)',    icon: 'dumbbell' },
+      off:        { label: 'Ninja Off Day',   color: 'var(--muted)',   icon: 'wind' },
+      stage:      { label: 'Stage Training',  color: 'var(--red)',     icon: 'flag' },
+      stretching: { label: 'Stretching',      color: 'var(--cyan)',    icon: 'wind' },
+      sonstiges:  { label: 'Sonstiges',       color: 'var(--muted)',   icon: 'plus-circle' },
     };
+    const CAT_ALIAS = { sprint: 'speed' };
+    function catKey(k) { return CAT_ALIAS[k] || k; }
+    function catOf(k) { return CATS[catKey(k)] || CATS.sonstiges; }
 
     const ICONS = {
       zap: '<path d="M13 2L3 14h9l-1 10 10-12h-9l1-10z"/>',
@@ -1290,7 +1302,7 @@
 
       let html = '';
       acts.forEach((a, idx) => {
-        const cat = CATS[a.cat] || CATS.sonstiges;
+        const cat = catOf(a.cat);
         const chkCls = a.done ? 'checkbox checked' : 'checkbox';
         const color = cat.color;
         html += `
@@ -1376,7 +1388,7 @@
 
     function closeAddExerciseModal() {
       document.getElementById('addExerciseModal').classList.remove('active');
-      document.getElementById('exerciseCategory').value = 'ninja';
+      document.getElementById('exerciseCategory').value = 'technik';
       document.getElementById('exerciseName').value = '';
       document.getElementById('exerciseDuration').value = '';
       document.getElementById('exerciseNotes').value = '';
@@ -1441,29 +1453,46 @@
       const suppCompliance = suppPossible > 0 ? Math.round((suppDone / suppPossible) * 100) : 0;
       document.getElementById('suppCompliance').textContent = suppCompliance + '%';
 
-      const typeCounts = { ninja: 0, kraft: 0, ausdauer: 0, sprint: 0, stage: 0, stretching: 0, sonstiges: 0 };
+      const typeCounts = {};
+      Object.keys(CATS).forEach(k => typeCounts[k] = 0);
+      let totalActs = 0;
       for (let i = 0; i < 30; i++) {
         const d = new Date();
         d.setDate(d.getDate() - i);
         const dk = getDateKey(d);
         const acts = customActs[dk] || [];
         acts.forEach(a => {
-          if (typeCounts.hasOwnProperty(a.cat)) typeCounts[a.cat]++;
+          const k = catKey(a.cat);
+          if (typeCounts.hasOwnProperty(k)) typeCounts[k]++;
+          else typeCounts.sonstiges++;
+          totalActs++;
         });
       }
       const maxCount = Math.max(...Object.values(typeCounts), 1);
+      const sorted = Object.keys(typeCounts).sort((a, b) => typeCounts[b] - typeCounts[a]);
       let chartHtml = '';
-      const typeKeys = Object.keys(typeCounts);
-      typeKeys.forEach(t => {
-        const pct = (typeCounts[t] / maxCount) * 100;
-        const col = CATS[t].color;
+      sorted.forEach(t => {
+        const c = typeCounts[t];
+        const cat = CATS[t];
+        const pct = (c / maxCount) * 100;
+        const sharePct = totalActs > 0 ? Math.round((c / totalActs) * 100) : 0;
         chartHtml += `
-          <div class="bar-item" style="background: ${col}; height: ${pct}%;">
-            <div class="bar-label">${t.substring(0, 3)}</div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <div style="width: 92px; font-size: 11px; color: ${c > 0 ? 'var(--text)' : 'var(--muted)'}; font-weight: ${c > 0 ? 500 : 400};">${cat.label}</div>
+            <div style="flex: 1; background: var(--card2); border-radius: 4px; height: 16px; overflow: hidden; position: relative;">
+              <div style="width: ${pct}%; height: 100%; background: ${cat.color}; transition: width 0.3s;"></div>
+            </div>
+            <div style="width: 56px; text-align: right; font-size: 11px; font-family: 'Space Mono', monospace;">
+              <span style="font-weight: 700;">${c}</span>
+              <span style="color: var(--muted); margin-left: 4px;">${sharePct}%</span>
+            </div>
           </div>
         `;
       });
-      document.getElementById('typeChart').innerHTML = chartHtml;
+      const chartEl = document.getElementById('typeChart');
+      chartEl.style.height = 'auto';
+      chartEl.style.display = 'block';
+      chartEl.innerHTML = chartHtml;
     }
 
     function renderCalendar() {
@@ -1499,7 +1528,10 @@
       const d = dateFromKey(dk);
       const ev = COMP_EVENTS[dk];
       const phase = getCurrentPhase(d);
-      let html = `<div style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">${formatDate(d)}</div>`;
+      let html = `<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+        <div style="font-size: 13px; font-weight: 600;">${formatDate(d)}</div>
+        <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="jumpToDay('${dk}')">📝 Bearbeiten</button>
+      </div>`;
       html += `<div style="margin-bottom: 10px;"><span class="phase-pill"><span class="dot" style="background:${phase.color};"></span>Phase ${phase.id} · ${phase.name}</span></div>`;
 
       if (ev) {
@@ -1560,6 +1592,10 @@
 
       const dayName = CURRENT_DATE.toLocaleDateString('de-DE', { weekday: 'short' });
       document.getElementById('dayDisplay').textContent = dayName.toUpperCase().substring(0, 2);
+
+      // Show "HEUTE" snap-back when viewing a different day
+      const todayBtn = document.getElementById('todayBtn');
+      if (todayBtn) todayBtn.style.display = isToday ? 'none' : 'flex';
 
       // Race-day banner
       const banner = document.getElementById('raceBanner');
@@ -1663,6 +1699,25 @@
           </div>`;
       }).join('');
       document.getElementById('timelineList').innerHTML = html;
+    }
+
+    function jumpToDay(dk) {
+      CURRENT_DATE = dateFromKey(dk);
+      // Switch to Today tab
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-heute').classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      document.querySelector('.nav-item[data-page=page-heute]').classList.add('active');
+      // Scroll content area to top
+      document.querySelector('.content').scrollTop = 0;
+      renderToday();
+      renderHeroInfo();
+    }
+
+    function jumpToToday() {
+      CURRENT_DATE = new Date();
+      renderToday();
+      renderHeroInfo();
     }
 
     function handlePrevDay() {
@@ -2160,6 +2215,7 @@
     document.getElementById('coachBtn').onclick = () => setMode('coach');
     document.getElementById('prevDayBtn').onclick = handlePrevDay;
     document.getElementById('nextDayBtn').onclick = handleNextDay;
+    document.getElementById('todayBtn').onclick = jumpToToday;
 
     document.addEventListener('keydown', e => {
       if (e.key === 'Enter' && document.getElementById('nameOverlay').classList.contains('active')) {
@@ -2211,6 +2267,8 @@
     window.deleteExercise = deleteExercise;
     window.toggleSupp = toggleSupp;
     window.selectCalendarDay = selectCalendarDay;
+    window.jumpToDay = jumpToDay;
+    window.jumpToToday = jumpToToday;
   </script>
 </body>
 </html>
