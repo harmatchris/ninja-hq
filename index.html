@@ -531,6 +531,139 @@
       border-radius: 3px;
     }
 
+    .race-banner {
+      background: linear-gradient(135deg, rgba(244,63,94,0.18), rgba(251,146,60,0.12));
+      border: 1px solid var(--red);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 0 24px rgba(244,63,94,0.18);
+    }
+    .race-banner .race-emoji { font-size: 28px; }
+    .race-banner .race-title { font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--red); }
+    .race-banner .race-sub { font-size: 12px; color: var(--text); margin-top: 2px; }
+
+    .next-event-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--purple);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .next-event-card .ne-emoji { font-size: 22px; }
+    .next-event-card .ne-title { font-weight: 600; font-size: 14px; }
+    .next-event-card .ne-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .next-event-card .ne-days {
+      margin-left: auto;
+      background: var(--purple);
+      color: var(--bg);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .phase-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .phase-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
+
+    .supp-group-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 12px 0 6px 4px;
+    }
+
+    .protokoll-step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .protokoll-step .ps-time {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--purple);
+      min-width: 64px;
+    }
+    .protokoll-step .ps-text { font-size: 13px; flex: 1; }
+
+    .wissen-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .wissen-block h4 { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--purple); }
+    .wissen-block h5 { margin: 12px 0 6px; font-size: 12px; font-weight: 600; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.5px; }
+    .wissen-block p, .wissen-block li { font-size: 13px; line-height: 1.55; color: var(--text); }
+    .wissen-block ul { margin: 4px 0; padding-left: 18px; }
+    .wissen-block .meta { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .wissen-block table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 6px 0; }
+    .wissen-block th, .wissen-block td { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+    .wissen-block th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+
+    .calendar-day.event {
+      background: var(--red) !important;
+      color: white !important;
+      font-weight: 700;
+      border-color: var(--red) !important;
+    }
+    .calendar-day.travel {
+      background: rgba(251, 146, 60, 0.2) !important;
+      border-color: var(--orange) !important;
+      color: var(--orange) !important;
+    }
+    .calendar-day.phase1 { border-left: 3px solid var(--cyan); }
+    .calendar-day.phase2 { border-left: 3px solid var(--purple); }
+    .calendar-day.phase3 { border-left: 3px solid var(--blue); }
+    .calendar-day.phase4 { border-left: 3px solid var(--red); }
+
+    .timeline-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 6px;
+    }
+    .timeline-row.is-today { border-color: var(--purple); box-shadow: var(--glow); }
+    .timeline-row.is-past { opacity: 0.5; }
+    .timeline-row .tr-date { font-family: 'Space Mono', monospace; font-size: 12px; min-width: 56px; color: var(--muted); }
+    .timeline-row .tr-emoji { font-size: 18px; }
+    .timeline-row .tr-info { flex: 1; }
+    .timeline-row .tr-title { font-weight: 600; font-size: 13px; }
+    .timeline-row .tr-sub { font-size: 11px; color: var(--muted); }
+
     .splash {
       position: fixed;
       inset: 0;
@@ -621,6 +754,8 @@
 
       <!-- HEUTE TAB -->
       <div class="page active" id="page-heute">
+        <div id="raceBanner"></div>
+        <div id="nextEventCard"></div>
         <div class="hero-card">
           <svg class="progress-ring" id="progressRing" viewBox="0 0 120 120">
             <circle cx="60" cy="60" r="54" fill="none" stroke="var(--border)" stroke-width="8"/>
@@ -640,6 +775,11 @@
           <button class="day-nav-btn" id="nextDayBtn">→</button>
         </div>
 
+        <div class="section" id="protokollSection" style="display: none;">
+          <div class="section-title">Wettkampftag-Protokoll</div>
+          <div id="protokollList"></div>
+        </div>
+
         <div class="section">
           <div class="section-title">Training</div>
           <div id="exercisesList"></div>
@@ -656,6 +796,11 @@
           <div id="supplementsList"></div>
         </div>
 
+        <div class="section">
+          <div class="section-title">Wettkampf-Timeline</div>
+          <div id="timelineList"></div>
+        </div>
+
         <div class="section" id="coachSection" style="display: none;">
           <div class="section-title">Coach Info</div>
           <div id="coachInfo"></div>
@@ -666,11 +811,27 @@
       <div class="page" id="page-history">
         <div class="section">
           <div class="section-title">Phase Timeline</div>
-          <div style="display: flex; gap: 8px; font-size: 12px;">
-            <div style="flex: 1; text-align: center; padding: 8px; background: var(--card); border-radius: 8px;">START</div>
-            <div style="flex: 1; text-align: center; padding: 8px; background: var(--card); border-radius: 8px;" id="vrLabel">VR</div>
-            <div style="flex: 1; text-align: center; padding: 8px; background: var(--card); border-radius: 8px;" id="f1Label">F1</div>
-            <div style="flex: 1; text-align: center; padding: 8px; background: var(--card); border-radius: 8px;" id="f2Label">F2</div>
+          <div style="display: flex; gap: 6px; font-size: 11px;">
+            <div style="flex: 1; text-align: center; padding: 8px; background: var(--card); border-radius: 8px;" id="phaseStart">
+              <div style="color: var(--cyan); font-weight: 600;">TAPER</div>
+              <div style="color: var(--muted); font-size: 10px; margin-top: 2px;">06.05.</div>
+            </div>
+            <div style="flex: 1; text-align: center; padding: 8px; background: var(--card); border-radius: 8px;" id="vrLabel">
+              <div style="color: var(--purple); font-weight: 600;">VR</div>
+              <div style="color: var(--muted); font-size: 10px; margin-top: 2px;">19.05.</div>
+            </div>
+            <div style="flex: 1; text-align: center; padding: 8px; background: var(--card); border-radius: 8px;" id="hfLabel">
+              <div style="color: var(--blue); font-weight: 600;">HF</div>
+              <div style="color: var(--muted); font-size: 10px; margin-top: 2px;">27/28.05.</div>
+            </div>
+            <div style="flex: 1; text-align: center; padding: 8px; background: var(--card); border-radius: 8px;" id="f1Label">
+              <div style="color: var(--orange); font-weight: 600;">F1</div>
+              <div style="color: var(--muted); font-size: 10px; margin-top: 2px;">30.05.</div>
+            </div>
+            <div style="flex: 1; text-align: center; padding: 8px; background: var(--card); border-radius: 8px;" id="f2Label">
+              <div style="color: var(--red); font-weight: 600;">F2</div>
+              <div style="color: var(--muted); font-size: 10px; margin-top: 2px;">02.06.</div>
+            </div>
           </div>
         </div>
 
@@ -807,7 +968,7 @@
       </svg>
       <span>Stats</span>
     </button>
-    <button class="nav-item" data-page="page-wissen" style="display: none;" id="wissenNav">
+    <button class="nav-item" data-page="page-wissen" id="wissenNav">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path>
         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"></path>
@@ -897,11 +1058,36 @@
   <script>
     const LS = { C: 'njc_v6', N: 'njn_v4', M: 'njm_v3', R: 'njr_v3', P: 'njp_v3', S: 'njs_v2', E: 'nje_v1', T: 'njt_v1', F: 'njf_v1', A: 'nja_v1' };
     const SUPPS = [
-      { id: 's1', name: 'Vitamin D', dose: '2000 IU' },
-      { id: 's2', name: 'Omega-3', dose: '1g' },
-      { id: 's3', name: 'Magnesium', dose: '300mg' },
-      { id: 's4', name: 'Zinc', dose: '15mg' },
-      { id: 's5', name: 'Iron', dose: '15mg' },
+      { id: 's1', name: 'NMN Pro Complete', dose: 'nüchtern, vor Frühstück', when: 'morgens' },
+      { id: 's2', name: 'Omega-3 Fish Oil', dose: '2 Kapseln zum Frühstück', when: 'morgens' },
+      { id: 's3', name: 'Immun Complex', dose: 'gemäß Packung', when: 'morgens' },
+      { id: 's4', name: 'Beta-Alanin', dose: '3.2g (Tagesdosis)', when: 'morgens' },
+      { id: 's5', name: 'Magnesium + B12', dose: '2–3 Gummies zum Mittag', when: 'mittags' },
+      { id: 's6', name: 'BCAA', dose: '60 Min vor Training', when: 'pre' },
+      { id: 's7', name: 'Creatin Monohydrat', dose: '5g + Banane (post)', when: 'post' },
+      { id: 's8', name: 'Rote Bete Konzentrat', dose: '70ml · 2–3h vor Start', when: 'wettkampf', compOnly: true },
+    ];
+    const SUPP_GROUPS = {
+      morgens: 'Morgens (07:00) — Stack',
+      mittags: 'Mittags (12:30)',
+      pre: 'Pre-Training (–60 Min)',
+      post: 'Post-Workout',
+      wettkampf: '🥬 Nur Wettkampftag',
+    };
+    const COMP_EVENTS = {
+      '20260518': { type: 'travel',   emoji: '🚐', title: 'Anreise / Drehbeginn',         sub: 'Check-In Hotel Köln · Hotel-Survival-Kit',           short: 'Anreise' },
+      '20260519': { type: 'comp',     emoji: '🔥', title: 'VORRUNDE',                      sub: 'Bis zu 8 Hindernisse + Mega-Wand',                    short: 'VR' },
+      '20260522': { type: 'comp',     emoji: '⚔️',  title: 'DUELL-PARCOURS',                sub: 'Wenn unter Top 4 — direktes Final-Ticket möglich',    short: 'Duell' },
+      '20260527': { type: 'comp',     emoji: '🔥', title: 'HALBFINALE 1',                  sub: '7 Hindernisse · 36–42 Ninjas',                        short: 'HF1' },
+      '20260528': { type: 'comp',     emoji: '🔥', title: 'HALBFINALE 2',                  sub: '7 Hindernisse · Top 15 ins Finale 1',                 short: 'HF2' },
+      '20260530': { type: 'comp',     emoji: '🏁', title: 'FINALE 1 — Stage 1',            sub: 'Bis 11 Hindernisse · Zeitlimit',                      short: 'F1' },
+      '20260602': { type: 'comp',     emoji: '👑', title: 'FINALE 2 — Stage 2/3/4',        sub: 'Mount Midoriyama · der Marathon-Tag',                 short: 'F2' },
+    };
+    const PHASES = [
+      { id: 1, name: 'Pre-Wettkampf Taper',    start: new Date(2026, 4, 6),  end: new Date(2026, 4, 17), color: 'var(--cyan)',   desc: 'Form schärfen ohne zu ermüden' },
+      { id: 2, name: 'Vorrunde + Duell',       start: new Date(2026, 4, 18), end: new Date(2026, 4, 22), color: 'var(--purple)', desc: 'All-In Performance' },
+      { id: 3, name: 'Recovery + Halbfinale',  start: new Date(2026, 4, 23), end: new Date(2026, 4, 28), color: 'var(--blue)',   desc: 'Speed & Technik' },
+      { id: 4, name: 'Finale 1 + Finale 2',    start: new Date(2026, 4, 29), end: new Date(2026, 5, 2),  color: 'var(--red)',    desc: 'Marathon-Tage' },
     ];
     const CATS = {
       ninja: { label: 'Ninja Skills', color: 'var(--purple)', icon: 'swords' },
@@ -949,8 +1135,13 @@
     let IS_VIEW = false;
     let MODE = 'athlet';
     let CURRENT_DATE = new Date();
-    const START_DATE = new Date(2025, 0, 1);
-    const TARGET_DATE = new Date(2025, 5, 1);
+    const START_DATE  = new Date(2026, 4, 6);   // 06.05.2026 — Phase 1 begin
+    const ARRIVAL     = new Date(2026, 4, 18);  // 18.05.2026 — Anreise
+    const VR_DATE     = new Date(2026, 4, 19);  // 19.05.2026 — Vorrunde
+    const F1_DATE     = new Date(2026, 4, 30);  // 30.05.2026 — Finale 1
+    const F2_DATE     = new Date(2026, 5, 2);   // 02.06.2026 — Finale 2
+    const END_DATE    = new Date(2026, 5, 3);   // 03.06.2026 — Vertragsende
+    const TARGET_DATE = VR_DATE;
     let checks = {};
     let notes = [];
     let mmLogs = [];
@@ -993,6 +1184,37 @@
     function formatDate(d) {
       const opts = { weekday: 'short', month: 'short', day: 'numeric' };
       return d.toLocaleDateString('de-DE', opts);
+    }
+
+    function dayDiff(a, b) {
+      const ms = 24 * 60 * 60 * 1000;
+      const da = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+      const db = new Date(b.getFullYear(), b.getMonth(), b.getDate());
+      return Math.round((da - db) / ms);
+    }
+
+    function getCurrentPhase(date) {
+      for (const p of PHASES) {
+        if (date >= p.start && date <= new Date(p.end.getFullYear(), p.end.getMonth(), p.end.getDate(), 23, 59, 59)) {
+          return p;
+        }
+      }
+      if (date < PHASES[0].start) return { id: 0, name: 'Pre-Plan', desc: 'Aufbau-Phase', color: 'var(--muted)', start: PHASES[0].start, end: PHASES[0].start };
+      return { id: 5, name: 'Post-Wettkampf', desc: 'Erholung', color: 'var(--muted)', start: END_DATE, end: END_DATE };
+    }
+
+    function getNextEvent(fromDate) {
+      const todayKey = getDateKey(fromDate);
+      const sorted = Object.keys(COMP_EVENTS).sort();
+      for (const k of sorted) {
+        if (k >= todayKey) return { dk: k, ...COMP_EVENTS[k], date: dateFromKey(k) };
+      }
+      return null;
+    }
+
+    function isCompDay(dk) {
+      const ev = COMP_EVENTS[dk];
+      return ev && ev.type === 'comp';
     }
 
     function addAudio() {
@@ -1052,7 +1274,8 @@
       const dk = getDateKey(CURRENT_DATE);
       const acts = customActs[dk] || [];
       const totalDone = acts.filter(a => a.done).length;
-      const totalSupps = SUPPS.length;
+      const compTodayForCount = isCompDay(dk);
+      const totalSupps = SUPPS.filter(s => !s.compOnly || compTodayForCount).length;
       const suppsDone = countSuppsChecks(dk);
       const total = acts.length + totalSupps;
       const done = totalDone + suppsDone;
@@ -1090,24 +1313,33 @@
       });
       document.getElementById('exercisesList').innerHTML = html || '<p style="color: var(--muted); font-size: 12px;">Keine Ubungen hinzugefugt</p>';
 
+      const compToday = isCompDay(dk);
+      const visible = SUPPS.filter(s => !s.compOnly || compToday);
+      const groupOrder = ['morgens', 'mittags', 'pre', 'post', 'wettkampf'];
       let suppHtml = '';
-      SUPPS.forEach(s => {
-        const key = `${dk}_supps_supp_${s.id}`;
-        const isChecked = !!checks[key];
-        suppHtml += `
-          <div class="card" style="background: var(--card2);">
-            <div class="exercise-icon" style="background: var(--cyan)33; color: var(--cyan);">
-              ${icon('pill', 18)}
+      groupOrder.forEach(g => {
+        const items = visible.filter(s => s.when === g);
+        if (!items.length) return;
+        suppHtml += `<div class="supp-group-title">${SUPP_GROUPS[g]}</div>`;
+        items.forEach(s => {
+          const key = `${dk}_supps_supp_${s.id}`;
+          const isChecked = !!checks[key];
+          const tone = g === 'wettkampf' ? 'var(--red)' : 'var(--cyan)';
+          suppHtml += `
+            <div class="card" style="background: var(--card2);">
+              <div class="exercise-icon" style="background: ${tone}33; color: ${tone};">
+                ${icon('pill', 18)}
+              </div>
+              <div class="exercise-info">
+                <div class="exercise-name">${s.name}</div>
+                <div class="exercise-meta">${s.dose}</div>
+              </div>
+              <div class="${isChecked ? 'checkbox checked' : 'checkbox'}" onclick="toggleSupp('${key}')">
+                ${isChecked ? icon('check', 16) : ''}
+              </div>
             </div>
-            <div class="exercise-info">
-              <div class="exercise-name">${s.name}</div>
-              <div class="exercise-meta">${s.dose}</div>
-            </div>
-            <div class="${isChecked ? 'checkbox checked' : 'checkbox'}" onclick="toggleSupp('${key}')">
-              ${isChecked ? icon('check', 16) : ''}
-            </div>
-          </div>
-        `;
+          `;
+        });
       });
       document.getElementById('supplementsList').innerHTML = suppHtml;
     }
@@ -1178,7 +1410,7 @@
     }
 
     function updateStats() {
-      const daysUntilTarget = Math.ceil((TARGET_DATE - new Date()) / (1000 * 60 * 60 * 24));
+      const daysUntilTarget = dayDiff(TARGET_DATE, new Date());
       document.getElementById('daysToVR').textContent = Math.max(0, daysUntilTarget);
 
       let streak = 0;
@@ -1197,15 +1429,16 @@
       }
       document.getElementById('daysTrained').textContent = trained;
 
-      let totalSupps = SUPPS.length;
-      let suppDone = 0;
+      let suppDone = 0, suppPossible = 0;
       for (let i = 0; i < 30; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dk = getDateKey(d);
+        const dd = new Date();
+        dd.setDate(dd.getDate() - i);
+        const dk = getDateKey(dd);
+        const possibleToday = SUPPS.filter(s => !s.compOnly || isCompDay(dk)).length;
+        suppPossible += possibleToday;
         suppDone += countSuppsChecks(dk);
       }
-      const suppCompliance = totalSupps * 30 > 0 ? Math.round((suppDone / (totalSupps * 30)) * 100) : 0;
+      const suppCompliance = suppPossible > 0 ? Math.round((suppDone / suppPossible) * 100) : 0;
       document.getElementById('suppCompliance').textContent = suppCompliance + '%';
 
       const typeCounts = { ninja: 0, kraft: 0, ausdauer: 0, sprint: 0, stage: 0, stretching: 0, sonstiges: 0 };
@@ -1234,18 +1467,28 @@
     }
 
     function renderCalendar() {
+      // Show 5 weeks: 04.05.2026 (Mo) → 07.06.2026 (So), covering Phase 1–4 + buffer
+      const start = new Date(2026, 4, 4);
+      const todayKey = getDateKey(new Date());
       let html = '';
       for (let i = 0; i < 35; i++) {
-        const d = new Date(2025, 0, 1);
+        const d = new Date(start);
         d.setDate(d.getDate() + i);
-        if (d.getMonth() !== 0) break;
         const dk = getDateKey(d);
+        const phase = getCurrentPhase(d);
         const hasAct = hasActivity(dk);
-        const isToday = dk === getDateKey(CURRENT_DATE);
+        const ev = COMP_EVENTS[dk];
+        const isToday = dk === todayKey;
+        const isCurrent = dk === getDateKey(CURRENT_DATE);
         let cls = 'calendar-day';
+        if (phase.id >= 1 && phase.id <= 4) cls += ` phase${phase.id}`;
+        if (isCurrent) cls += ' active';
         if (isToday) cls += ' today';
-        if (hasAct) cls += ' filled active';
-        html += `<div class="${cls}" onclick="selectCalendarDay('${dk}')">${d.getDate()}</div>`;
+        if (ev && ev.type === 'comp') cls += ' event';
+        else if (ev && ev.type === 'travel') cls += ' travel';
+        if (hasAct && !ev) cls += ' filled';
+        const inner = ev ? `${d.getDate()}<div style="position:absolute;bottom:2px;right:4px;font-size:9px;opacity:0.85;">${ev.short}</div>` : d.getDate();
+        html += `<div class="${cls}" style="position:relative;" onclick="selectCalendarDay('${dk}')">${inner}</div>`;
       }
       document.getElementById('calendarGrid').innerHTML = html;
     }
@@ -1253,46 +1496,173 @@
     function selectCalendarDay(dk) {
       const acts = customActs[dk] || [];
       const suppCnt = countSuppsChecks(dk);
-      const oldCnt = countChecks(dk);
       const d = dateFromKey(dk);
-      let html = `<div style="font-size: 12px; margin-bottom: 8px;">${formatDate(d)}</div>`;
+      const ev = COMP_EVENTS[dk];
+      const phase = getCurrentPhase(d);
+      let html = `<div style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">${formatDate(d)}</div>`;
+      html += `<div style="margin-bottom: 10px;"><span class="phase-pill"><span class="dot" style="background:${phase.color};"></span>Phase ${phase.id} · ${phase.name}</span></div>`;
+
+      if (ev) {
+        const tone = ev.type === 'comp' ? 'var(--red)' : 'var(--orange)';
+        html += `<div style="padding: 10px 12px; background: ${tone}22; border-left: 3px solid ${tone}; border-radius: 6px; margin-bottom: 10px;">
+          <div style="font-weight: 700; font-size: 13px;">${ev.emoji} ${ev.title}</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">${ev.sub}</div>
+        </div>`;
+      }
 
       if (acts.length > 0) {
-        html += '<div style="font-size: 12px; margin-bottom: 8px;"><strong>Ubungen:</strong></div>';
+        html += '<div style="font-size: 12px; margin-bottom: 6px;"><strong>Übungen:</strong></div>';
         acts.forEach(a => {
           html += `<div style="padding: 4px 0; font-size: 11px;">• ${a.name}${a.duration ? ' (' + a.duration + 'min)' : ''}</div>`;
         });
       }
 
       if (suppCnt > 0) {
-        html += `<div style="font-size: 11px; margin-top: 8px;">✓ ${suppCnt} Supplements</div>`;
+        html += `<div style="font-size: 11px; margin-top: 8px;">✓ ${suppCnt} Supplements eingenommen</div>`;
       }
 
-      if (!acts.length && suppCnt === 0) {
-        html += '<div style="font-size: 11px; color: var(--muted);">Keine Aktivitat</div>';
+      if (!acts.length && suppCnt === 0 && !ev) {
+        html += '<div style="font-size: 11px; color: var(--muted);">Keine Aktivität</div>';
       }
 
       document.getElementById('dayDetail').innerHTML = html;
     }
 
     function renderHeroInfo() {
-      const phase = Math.floor((CURRENT_DATE - START_DATE) / (1000 * 60 * 60 * 24) / 7);
-      const daysUntilTarget = Math.ceil((TARGET_DATE - CURRENT_DATE) / (1000 * 60 * 60 * 24));
-      document.getElementById('heroTitle').textContent = CURRENT_DATE.toDateString() === new Date().toDateString() ? 'Heute' : formatDate(CURRENT_DATE);
-      document.getElementById('heroPhase').textContent = `Phase ${Math.max(0, phase)}`;
-      document.getElementById('heroCountdown').textContent = `${daysUntilTarget} Tage bis Target`;
-      document.getElementById('countdownBadge').textContent = `${Math.max(0, daysUntilTarget)}d`;
+      const dk = getDateKey(CURRENT_DATE);
+      const phase = getCurrentPhase(CURRENT_DATE);
+      const daysToVR = dayDiff(VR_DATE, CURRENT_DATE);
+      const daysToF2 = dayDiff(F2_DATE, CURRENT_DATE);
+      const isToday = CURRENT_DATE.toDateString() === new Date().toDateString();
 
-      const segments = 8;
+      document.getElementById('heroTitle').textContent = isToday ? 'Heute' : formatDate(CURRENT_DATE);
+      document.getElementById('heroPhase').innerHTML = `<span class="phase-pill"><span class="dot" style="background:${phase.color};"></span>Phase ${phase.id} · ${phase.name}</span>`;
+
+      let countdownText = '';
+      if (daysToVR > 0)        countdownText = `${daysToVR} Tage bis Vorrunde 🔥`;
+      else if (daysToVR === 0) countdownText = `🔥 VORRUNDE — HEUTE`;
+      else if (daysToF2 > 0)   countdownText = `${daysToF2} Tage bis Finale 2 👑`;
+      else if (daysToF2 === 0) countdownText = `👑 FINALE 2 — HEUTE`;
+      else                     countdownText = `Wettkampfblock abgeschlossen`;
+      document.getElementById('heroCountdown').textContent = countdownText;
+
+      const badgeNum = daysToVR > 0 ? daysToVR : (daysToF2 > 0 ? daysToF2 : 0);
+      document.getElementById('countdownBadge').textContent = `${badgeNum}d`;
+
+      // 4-segment phase bar
       let phaseHtml = '';
-      for (let i = 0; i < segments; i++) {
-        const cls = i <= Math.min(phase, segments - 1) ? 'phase-seg active' : 'phase-seg';
-        phaseHtml += `<div class="${cls}"></div>`;
-      }
+      PHASES.forEach(p => {
+        const cls = p.id === phase.id ? 'phase-seg active' : 'phase-seg';
+        const style = p.id === phase.id ? `background:${p.color};` : '';
+        phaseHtml += `<div class="${cls}" style="${style}"></div>`;
+      });
       document.getElementById('phaseBar').innerHTML = phaseHtml;
 
       const dayName = CURRENT_DATE.toLocaleDateString('de-DE', { weekday: 'short' });
       document.getElementById('dayDisplay').textContent = dayName.toUpperCase().substring(0, 2);
+
+      // Race-day banner
+      const banner = document.getElementById('raceBanner');
+      const ev = COMP_EVENTS[dk];
+      if (ev && isToday) {
+        banner.innerHTML = `
+          <div class="race-banner">
+            <div class="race-emoji">${ev.emoji}</div>
+            <div>
+              <div class="race-title">${ev.title}</div>
+              <div class="race-sub">${ev.sub}</div>
+            </div>
+          </div>`;
+      } else {
+        banner.innerHTML = '';
+      }
+
+      // Next-event card (only when navigating today + not already on event)
+      const next = getNextEvent(new Date());
+      const ne = document.getElementById('nextEventCard');
+      if (next && isToday && !ev) {
+        const days = dayDiff(next.date, new Date());
+        const dayLabel = days === 0 ? 'HEUTE' : (days === 1 ? 'MORGEN' : `${days}d`);
+        ne.innerHTML = `
+          <div class="next-event-card">
+            <div class="ne-emoji">${next.emoji}</div>
+            <div>
+              <div class="ne-title">Nächst: ${next.title}</div>
+              <div class="ne-meta">${formatDate(next.date)} · ${next.sub}</div>
+            </div>
+            <div class="ne-days">${dayLabel}</div>
+          </div>`;
+      } else {
+        ne.innerHTML = '';
+      }
+
+      renderProtokoll();
+      renderTimeline();
+    }
+
+    const RACE_PROTOKOLL = [
+      { time: 'T-12h',   text: 'Carb-Loading Abendessen (Pasta/Reis) · 8–9h Schlaf · keine neuen Lebensmittel' },
+      { time: '07:00',   text: 'Frühstück Option C — extra Carbs · Banane + Brötchen + Joghurt mitnehmen' },
+      { time: 'T-3h',    text: 'Skyr + Granola + Banane · 🥬 Rote Bete Konzentrat 70ml · 500ml Wasser' },
+      { time: 'T-90min', text: 'Reis-Waffeln + Erdnussbutter + Honig · 1 Banane · leichtes Aufwärmen' },
+      { time: 'T-60min', text: 'BCAA · kontinuierlich Wasser (kein Schluck-Bombing)' },
+      { time: 'T-15min', text: 'Box Breathing 3 Runden (4-4-4-4) · Mental Walkthrough · Hände-Öffnen visualisieren' },
+      { time: 'Parcours',text: 'Nach jedem Hindernis: 3s bewusste Entspannung · bei zu hohem Puls: tiefe Ausatmung' },
+      { time: 'Post',    text: '40–50g Protein + 80–100g Carbs in 30 Min · Magerquark/Shake + Banane · 5g Creatin' },
+      { time: '+2h',     text: 'Vollmahlzeit (Tortellini/Pasta) · Magnesium x2 abends · 9h Schlaf' },
+    ];
+
+    const F2_PROTOKOLL = [
+      { time: '07:00',   text: 'Frühstück Option C XL · 2× Bananen + 2× Brötchen + 2× Joghurt mitnehmen' },
+      { time: 'T-3h',    text: 'Skyr + Granola + Banane (mehr als sonst) · 🥬 Rote Bete 70ml · Saft + Wasser' },
+      { time: 'T-90min', text: 'Reis-Waffeln + EB + Honig · 1 Banane' },
+      { time: 'T-60min', text: 'BCAA' },
+      { time: 'Stage 2/3', text: 'Schnelle Carbs zwischen den Stages: Banane oder Honig-Squeeze' },
+      { time: 'Pre-Mount', text: '1 Banane + Schluck Saft · Wasser' },
+      { time: 'Post',    text: 'Doppelte Portion Post-Workout · Vollmahlzeit binnen 2h (Pizza/Pasta groß)' },
+    ];
+
+    function renderProtokoll() {
+      const dk = getDateKey(CURRENT_DATE);
+      const ev = COMP_EVENTS[dk];
+      const section = document.getElementById('protokollSection');
+      if (!ev || ev.type !== 'comp') {
+        section.style.display = 'none';
+        return;
+      }
+      const isF2 = (dk === '20260602');
+      const steps = isF2 ? F2_PROTOKOLL : RACE_PROTOKOLL;
+      const list = steps.map(s => `
+        <div class="protokoll-step">
+          <div class="ps-time">${s.time}</div>
+          <div class="ps-text">${s.text}</div>
+        </div>`).join('');
+      document.getElementById('protokollList').innerHTML = list;
+      section.style.display = 'block';
+    }
+
+    function renderTimeline() {
+      const todayKey = getDateKey(new Date());
+      const sorted = Object.keys(COMP_EVENTS).sort();
+      const html = sorted.map(k => {
+        const ev = COMP_EVENTS[k];
+        const d = dateFromKey(k);
+        let cls = 'timeline-row';
+        if (k === todayKey) cls += ' is-today';
+        else if (k < todayKey) cls += ' is-past';
+        const dateStr = d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+        const wd = d.toLocaleDateString('de-DE', { weekday: 'short' });
+        return `
+          <div class="${cls}">
+            <div class="tr-date">${wd} ${dateStr}</div>
+            <div class="tr-emoji">${ev.emoji}</div>
+            <div class="tr-info">
+              <div class="tr-title">${ev.title}</div>
+              <div class="tr-sub">${ev.sub}</div>
+            </div>
+          </div>`;
+      }).join('');
+      document.getElementById('timelineList').innerHTML = html;
     }
 
     function handlePrevDay() {
@@ -1318,13 +1688,11 @@
       if (MODE === 'athlet') {
         athletBtn.style.color = 'var(--purple)';
         coachBtn.style.color = 'var(--muted)';
-        wissenNav.style.display = 'none';
         boxBreathSection.style.display = 'none';
         coachSection.style.display = 'none';
       } else {
         athletBtn.style.color = 'var(--muted)';
         coachBtn.style.color = 'var(--blue)';
-        wissenNav.style.display = 'flex';
         boxBreathSection.style.display = 'block';
         coachSection.style.display = 'block';
       }
@@ -1461,8 +1829,212 @@
       animate();
     }
 
+    const WISSEN_CONTENT = {
+      0: `
+        <div class="wissen-block">
+          <h4>Übungs-Kategorien</h4>
+          <p>Filter nach Trainingstyp beim Hinzufügen einer Übung im Heute-Tab.</p>
+          <h5>Ninja Skills</h5>
+          <p>Hindernis-Spezifik · Mega-Wand · Bein-Klemm · Cliffhanger · Salmon Ladder · Warped Wall · Rolling Log · Devil Steps</p>
+          <h5>Kraft</h5>
+          <p>Klimmzüge · Pull-up Variationen · Front Lever · Muscle-Up · Dips · Hangeleine · Grip Strength</p>
+          <h5>Ausdauer</h5>
+          <p>Zone-2 Bike (130 BPM) · Stretches 20–30 Min · aktive Recovery</p>
+          <h5>Sprint</h5>
+          <p>Acceleration · Reaktiv-Training · Plyometrie · Anlauf-Drills für Mega-Wand</p>
+          <h5>Stage Training</h5>
+          <p>Komplette Parcours-Simulationen · Hindernis-Ketten · Race-Pace</p>
+          <h5>Stretching / Mobility</h5>
+          <p>Yoga · Foam Rolling (nicht direkt nach Performance!) · Schulter & Hüfte mobility</p>
+        </div>
+      `,
+      1: `
+        <div class="wissen-block">
+          <h4>Supplement-Protokoll</h4>
+          <h5>Morgens (07:00) — komplette Stack</h5>
+          <ul>
+            <li><strong>NMN Pro Complete</strong> — nüchtern, 30 Min vor Frühstück</li>
+            <li><strong>Omega-3 Fish Oil</strong> — 2 Kapseln zum Frühstück</li>
+            <li><strong>Immun Complex</strong> — gemäß Packung</li>
+            <li><strong>Beta-Alanin 3.2g</strong> — komplette Tagesdosis morgens</li>
+          </ul>
+          <p class="meta">Carnosin-Wirkung von Beta-Alanin ist kumulativ über Wochen, nicht akut. Mögliches Kribbeln ist harmlos. Bei Wettkampfwoche evtl. auf 2.4g morgens reduzieren.</p>
+          <h5>Mittags (12:30)</h5>
+          <ul><li><strong>Magnesium + B12 Gummies</strong> — 2–3 Stück</li></ul>
+          <h5>Pre-Training (–60 Min)</h5>
+          <ul><li><strong>BCAA</strong> — gemäß Packung</li></ul>
+          <h5>Post-Workout (sofort)</h5>
+          <ul><li><strong>Creatin Monohydrat 5g</strong> — MIT Banane oder schnellen Carbs (Insulin-Aufnahme +60%)</li></ul>
+          <h5>Nur Wettkampftag (2–3h vor Start) 🥬</h5>
+          <ul><li><strong>Rote Bete Konzentrat 70ml</strong> ODER L-Citrullin Malat 6–8g</li></ul>
+          <p class="meta">⚠️ Vor Wettkampf testen — niemals zum ersten Mal am Wettkampftag!</p>
+          <h5>Wettkampftag-Recovery</h5>
+          <p>Magnesium abends <strong>verdoppeln</strong> für Krampfprävention · 9h Schlaf an Recovery-Tagen.</p>
+        </div>
+      `,
+      2: `
+        <div class="wissen-block">
+          <h4>Tagesziele Makros</h4>
+          <table>
+            <tr><th>Nährstoff</th><th>Trainingstag</th><th>Wettkampftag</th><th>Recovery</th></tr>
+            <tr><td>Kalorien</td><td>2800–3000</td><td>3000–3200</td><td>2600–2800</td></tr>
+            <tr><td>Protein</td><td>140–150g</td><td>140–150g</td><td>130–140g</td></tr>
+            <tr><td>Carbs</td><td>280–350g</td><td>350–400g</td><td>250–300g</td></tr>
+            <tr><td>Fett</td><td>70–90g</td><td>70–90g</td><td>70–80g</td></tr>
+            <tr><td>Wasser</td><td>2.5–3L</td><td>3L+</td><td>2.5L</td></tr>
+          </table>
+          <h5>Nicht essen</h5>
+          <p>❌ Fisch (außer Fischstäbchen) · ❌ Meeresfrüchte · ❌ Pilze · ❌ Auberginen · ❌ "normales" Fleisch (nur paniert / Wurst / Schinken / Salami)</p>
+        </div>
+        <div class="wissen-block">
+          <h4>🏠 Phase 1: Zuhause (06.05.–17.05.)</h4>
+          <h5>Frühstück</h5>
+          <p><strong>A — Skyr-Klassiker:</strong> 250–300g Skyr · 50g Granola · Banane + Beeren · 2 Eier · Kaffee</p>
+          <p><strong>B — Skyr-Power (Trainingstage):</strong> 250g Skyr · 50g Haferflocken eingerührt · Banane + Honig · 2 Eier · Glas OS</p>
+          <p><strong>C — Pancake-Day:</strong> 3–4 Protein-Pancakes (Banane + Eier + Hafer) · 200g Skyr Topping · Honig + Beeren</p>
+          <h5>Mittagessen</h5>
+          <p><strong>A:</strong> Hähnchen-Schnitzel paniert 200g · Reis 150g/Pommes · Gemüse</p>
+          <p><strong>B:</strong> Pasta 150g (roh) Schinken-Sahne · viel Käse · großer Salat</p>
+          <p><strong>C:</strong> Pizza Schinken/Salami · extra Käse · Salat</p>
+          <h5>Pre-Training</h5>
+          <p>Reis-Waffeln + Erdnussbutter + Honig · Banane (Standard)</p>
+          <h5>Post-Workout</h5>
+          <p><strong>A — Magerquark-Power:</strong> 500g Magerquark mit Honig + Beeren = 50g Protein · Banane · 5g Creatin · Weißbrot mit Honig</p>
+          <h5>Abendessen</h5>
+          <p>Tortellini Schinken/Käse · Käsespätzle · Käse-Toast (alle mit Salat)</p>
+        </div>
+        <div class="wissen-block">
+          <h4>🏨 Phase 2: Hotel Köln (18.05.–02.06.)</h4>
+          <h5>Hotel-Survival-Kit (erster Einkauf)</h5>
+          <p><strong>Mini-Kühlschrank:</strong> Skyr × 6–8 · Magerquark × 4–6 · Salami/Schinken/Käse-Scheiben × 2 Pkg · Eier · Beeren · Saftschorle</p>
+          <p><strong>Zimmer:</strong> Bananen × 10–15 · Äpfel · Hafer-Riegel × 15–20 · Reis-Waffeln × 2 Pkg · Erdnussbutter · Honig · Mandeln · Whey + Shaker</p>
+          <h5>Frühstück Buffet</h5>
+          <p><strong>A Standard:</strong> 2–3 Becher Joghurt/Quark · Müsli/Granola · Banane + Beeren · 2–3 Eier · Brötchen Schinken/Käse</p>
+          <p><strong>C Wettkampftag:</strong> XL Carbs · 2–3 Becher Joghurt + Honig · 3 Eier · 1–2 Brötchen mit Honig · Banane + Saft</p>
+          <p class="meta">💡 1 Banane + 1 Brötchen + 1 Joghurt für später in die Tasche mitnehmen!</p>
+          <h5>Mittag/Abend auswärts</h5>
+          <p><strong>A Italiener:</strong> Pizza Prosciutto · Pasta Carbonara · Tortellini Panna e Prosciutto</p>
+          <p><strong>B Wirtshaus:</strong> Schnitzel "Wiener Art" · Käsespätzle · Schinken-Käse-Toast</p>
+          <p><strong>C Lieferdienst:</strong> Pizza groß · Pasta-Box · Schnitzel-Menü</p>
+        </div>
+      `,
+      3: `
+        <div class="wissen-block">
+          <h4>16-Tage Strategie — Pacing</h4>
+          <p><strong>Hauptregel:</strong> Du performst nicht einmal, sondern bis zu 4–5 mal in 16 Tagen. <em>Pacing &gt; Peaking.</em></p>
+        </div>
+        <div class="wissen-block">
+          <h4>Phase 1: Pre-Wettkampf Taper (06.–17.05.)</h4>
+          <ul>
+            <li><strong>06.–11.05.:</strong> 60% Volumen, letzte intensive Stage-Sim Sa 11.05.</li>
+            <li><strong>12.–15.05.:</strong> 40–50% Volumen, 1–2 kurze Technik-Sessions (15–20 Min)</li>
+            <li><strong>16.–17.05.:</strong> Aktive Recovery — Spazieren, Mobility, Schlaf maximieren</li>
+            <li><strong>18.05.:</strong> Anreise + ganz lockeres Bewegen</li>
+          </ul>
+        </div>
+        <div class="wissen-block">
+          <h4>Phase 2: Vorrunde + Duell (19.–22.05.)</h4>
+          <table>
+            <tr><th>Tag</th><th>Plan</th></tr>
+            <tr><td>Mo 19.</td><td>🔥 VORRUNDE — All-In</td></tr>
+            <tr><td>Di 20.</td><td>Aktive Recovery: 30 Min Zone-2 · Stretching · Massage</td></tr>
+            <tr><td>Mi 21.</td><td>Mobility 20 Min · Mental Walkthrough Duell</td></tr>
+            <tr><td>Do 22.</td><td>🔥 DUELL-PARCOURS</td></tr>
+          </table>
+        </div>
+        <div class="wissen-block">
+          <h4>Phase 3: Recovery + Halbfinale (23.–28.05.)</h4>
+          <table>
+            <tr><th>Tag</th><th>Plan</th></tr>
+            <tr><td>Sa 23.</td><td>Komplette Ruhe · 9h+ Schlaf</td></tr>
+            <tr><td>So 24.</td><td>Aktive Recovery: 30 Min Zone-2 · Stretching</td></tr>
+            <tr><td>Mo 25.</td><td>1 leichte Technik-Session 20 Min · Mental HF</td></tr>
+            <tr><td>Di 26.</td><td>Pre-Race-Day: 15 Min · Schlaf maximieren</td></tr>
+            <tr><td>Mi 27.</td><td>🔥 HALBFINALE 1 (möglich)</td></tr>
+            <tr><td>Do 28.</td><td>🔥 HALBFINALE 2 (möglich)</td></tr>
+          </table>
+          <p class="meta">⚠️ Du weißt erst nach der Vorrunde, ob du am Mi oder Do läufst. Plan für beide gleich vorbereiten.</p>
+        </div>
+        <div class="wissen-block">
+          <h4>Phase 4: Finale 1 + Finale 2 (29.05.–02.06.)</h4>
+          <table>
+            <tr><th>Tag</th><th>Plan</th></tr>
+            <tr><td>Fr 29.</td><td>Recovery nach HF · 30 Min Zone-2 · Massage · 9h Schlaf</td></tr>
+            <tr><td>Sa 30.</td><td>🔥 FINALE 1 — Stage 1 · sofort danach Recovery-Protokoll</td></tr>
+            <tr><td>So 31.</td><td>Volle Recovery · 15 Min Mobility · Schlaf-Priorität</td></tr>
+            <tr><td>Mo 01.06.</td><td>Pre-Race-Day F2 · Mental Mount Midoriyama · 9h Schlaf</td></tr>
+            <tr><td>Di 02.06.</td><td>🔥 FINALE 2 — Stage 2/3/4 + Mount</td></tr>
+          </table>
+          <p class="meta">⚠️ Stage 2 + 3 + Mount sind direkt hintereinander = der Marathon des Tages.</p>
+        </div>
+      `,
+      4: `
+        <div class="wissen-block">
+          <h4>Mentale Strategie</h4>
+          <h5>Pacing über 16 Tage</h5>
+          <p>Du bist nicht in einem Sprint, du bist in einem Marathon mit 4–5 Sprints. Jede Performance maximal — aber zwischen den Performances <strong>bewusst runterregulieren</strong>.</p>
+          <h5>Vorrunde-Mentalität (19.05.)</h5>
+          <p>All-In auf Mega-Wand-Bezwingung → garantiert Halbfinale. Top 12 reicht auch. Top 4 ist Bonus für Duell.</p>
+          <h5>Duell-Mentalität (22.05.)</h5>
+          <p>Wenn Mega-Wand schon am 19. geschafft: Du bist eh im HF → Duell ist "house money". Wenn nicht: 2. Platz im Duell oder Top 12 reicht.</p>
+          <h5>Halbfinale</h5>
+          <p>7 Hindernisse, schnellste Zeit zählt. Top 15 für Finale 1. Pure Speed-Performance, weniger taktisch.</p>
+          <h5>Finale 1</h5>
+          <p>Zeitlimit-Parcours bis 11 Hindernisse. Du brauchst nur "in der Zeit fertig" → kein PR-Druck. <strong>Effizienz &gt; Geschwindigkeit.</strong></p>
+          <h5>Finale 2 (Stage 2/3/4 + Mount)</h5>
+          <p>Stage 2 + 3 direkt nacheinander = Ausdauer-Test. Mount Midoriyama mit Zeitlimit = der Endgegner. <strong>Bein-Klemm-Technik konsequent.</strong></p>
+        </div>
+        <div class="wissen-block">
+          <h4>Pre-Start Ritual (T-15 Min)</h4>
+          <ul>
+            <li>Box Breathing 3 Runden (4-4-4-4) — senkt Puls 10–15 BPM</li>
+            <li>Mental Walkthrough: jedes Hindernis im Kopf</li>
+            <li>Visualisieren: Hände öffnen zwischen Hindernissen</li>
+          </ul>
+          <h5>Auf dem Parcours</h5>
+          <ul>
+            <li>Nach jedem Hindernis: 3 Sekunden bewusste Entspannung</li>
+            <li>Mega-Wand: Anlauf-Rhythmus → nicht zu früh starten</li>
+            <li>Bei zu hohem Puls: kurze tiefe Ausatmung senkt Puls sofort</li>
+          </ul>
+        </div>
+        <div class="wissen-block">
+          <h4>Erfolgs-Definitionen</h4>
+          <table>
+            <tr><th>Stufe</th><th>Was wäre erreicht?</th></tr>
+            <tr><td>🥉 Minimum</td><td>Halbfinale (Top 12 oder Mega-Wand)</td></tr>
+            <tr><td>🥈 Stark</td><td>Finale 1 (Top 15 im HF)</td></tr>
+            <tr><td>🥇 Sehr stark</td><td>Finale 2 (Stage 1 in Zeit)</td></tr>
+            <tr><td>🏆 Legendär</td><td>Stage 2 + 3 absolviert, Mount erreicht</td></tr>
+            <tr><td>👑 Sieger</td><td>Mount in Zeit + schnellste Zeit = 300.000 €</td></tr>
+          </table>
+          <p class="meta">Realistisches Hauptziel basierend auf 8-Wochen-Vorbereitung: Finale 2 erreichen + so weit wie möglich kommen.</p>
+        </div>
+        <div class="wissen-block">
+          <h4>Notfall-Protokolle</h4>
+          <h5>"Schwer" fühlen vor Wettkampf</h5>
+          <p>30 Min lockeres Aufwärmen · Box Breathing · Visualisierung · NICHT zusätzlich essen.</p>
+          <h5>Nach Performance abkacken</h5>
+          <p>Akzeptanz-Modus, nicht Frust-Modus. Wenn weitere Wettkämpfe folgen: mental zurücksetzen.</p>
+          <h5>Schulter-Probleme</h5>
+          <p>Sofort Produktion melden · Eis 20 Min · Ibuprofen NUR wenn nötig (kann Heilung verzögern).</p>
+          <h5>Krank werden</h5>
+          <p>Nicht durchkämpfen — Risiko ganzer Block. Sofort Produktion informieren.</p>
+        </div>
+      `,
+    };
+
     function renderWissen() {
-      document.getElementById('wissenContent').innerHTML = '<p style="color: var(--muted); text-align: center;">Inhalte verfugbar in Coach-Modus</p>';
+      const tabs = document.querySelectorAll('#wissenTabs .tab-btn');
+      tabs.forEach(tab => {
+        tab.onclick = () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const idx = parseInt(tab.dataset.tab);
+          document.getElementById('wissenContent').innerHTML = WISSEN_CONTENT[idx] || '';
+        };
+      });
+      document.getElementById('wissenContent').innerHTML = WISSEN_CONTENT[0];
     }
 
     function renderMountMidoriyama() {
